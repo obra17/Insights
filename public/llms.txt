@@ -1,0 +1,43 @@
+# Obrainsights
+
+> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. Founder: Matt Keller. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
+
+## Services
+- [Prompt-to-Launch Kit](https://obrainsights.com/launch-kit/): one-page landing site on the customer's domain, waitlist, analytics, basic branding, launch copy.
+- [Vibe-Coded App Rescue](https://obrainsights.com/rescue/): audit and fix of apps built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code (deploy, auth, security, bugs, performance). Fixes delivered as pull requests.
+- [Agent Setup Concierge](https://obrainsights.com/agents/): done-for-you single-job AI agents (Inbox Triage, Content Repurposing, Lead Research) on customer-owned accounts, plus monthly retainers.
+- [Pricing](https://obrainsights.com/pricing/): all tiers.
+- [Free App Scan](https://obrainsights.com/scan/): free limited scan of a public URL or repo, report by email.
+
+## Prices
+Prompt-to-Launch Kit:
+- Starter: $299. Landing page, waitlist, domain/DNS help, analytics, 1 revision. Turnaround: 72 hours.
+- Standard: $599. Starter plus branding basics and a launch copy pack, 2 revisions. Turnaround: 4 business days.
+- Plus: $999. Standard plus a Product Hunt kit, OG/social assets, and a demo video script. Turnaround: 5 business days.
+
+Vibe-Coded App Rescue:
+- Health Scan: $99. Automated + agent-reviewed audit, severity-ranked report. Credited toward a fix.. Turnaround: 48 hours.
+- Fix Sprint: $750. Up to 5 critical/high issues fixed, PRs + handover, 7-day support. Turnaround: 5 business days.
+- Launch-Ready: $1,950. Up to 12 issues + production deploy, auth/payments verified, 14-day support. Turnaround: 10 business days.
+
+Agent Setup Concierge:
+- Single Agent: $1,200 setup. One agent from the catalog, runbook, monitoring. Turnaround: 5–7 business days.
+- Agent Pack: $2,900 setup. Three agents, shared dashboard. Turnaround: 10 business days.
+
+Retainers (month-to-month; customer pays model/API usage directly):
+- Care: $249/mo per agent. Monitoring, break-fix, monthly health report. Turnaround: Ongoing.
+- Ops: $599/mo (up to 3 agents). Care + 1 improvement/month + 48-hour response. Turnaround: Ongoing.
+- Pro: $1,200/mo (up to 6 agents). Ops + 3 improvements/month + priority response. Turnaround: Ongoing.
+
+Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; work beyond a tier gets a fixed-price change order, never hourly billing.
+
+## Policies
+- Customers own all accounts, domains, and code.
+- Least-privilege, revocable access; credentials are never stored in chat or repos.
+- Every change goes through a pull request the customer approves.
+- Full rebuilds and migrations are out of scope for App Rescue.
+
+## Optional
+- [About](https://obrainsights.com/about/)
+- [Contact](https://obrainsights.com/contact/)
+- [Newsletter](https://obrainsights.com/newsletter/)

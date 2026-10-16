@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+"""Generates the static site into public/. No dependencies. Run: python3 tools/build.py"""
+import json, os, html
+SITE = "https://obrainsights.com"
+OUT = os.path.join(os.path.dirname(__file__), "..", "public")
+# TODO(endpoints): set these to real form endpoints (e.g. Formspree, Tally, Netlify Forms, Cloudflare Worker).
+# While empty, forms validate but show a "not connected yet" notice instead of pretending to submit.
+SCAN_ENDPOINT = ""        # TODO: free app scan intake endpoint
+NEWSLETTER_ENDPOINT = ""  # TODO: newsletter provider endpoint (Beehiiv/ConvertKit)
+CONTACT_ENDPOINT = ""     # TODO: contact form endpoint
+
+NAV = [("/launch-kit/","Launch Kit"),("/rescue/","App Rescue"),("/agents/","Agent Setup"),("/pricing/","Pricing"),("/about/","About")]
+ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/logo.svg",
+       "founder":{"@type":"Person","name":"Matt Keller"},
+       "description":"Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}
+
+def e(s): return html.escape(s, quote=True)
+
+def faq_html(faqs):
+    return '<section class="faq"><h2>FAQ</h2>' + "".join(f'<details><summary>{e(q)}</summary><p>{e(a)}</p></details>' for q,a in faqs) + '</section>'
+def faq_ld(faqs):
+    return {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faqs]}
+def service_ld(name, desc, path, offers):
+    return {"@type":"Service","name":name,"description":desc,"url":SITE+path,"provider":{"@id":SITE+"/#org"},"areaServed":"Worldwide",
+            "offers":[{"@type":"Offer","name":n,"price":p,"priceCurrency":"USD"} for n,p in offers]}
+
+def tiers(rows):
+    out = '<div class="tiers">'
+    for name, price, inc, tat in rows:
+        out += f'<div class="card tier"><h3>{e(name)}</h3><p class="price">{e(price)}</p><p>{e(inc)}</p><p class="muted">Turnaround: {e(tat)}</p><a class="btn ghost" href="/contact/">Request this tier</a></div>'
+    return out + '</div><p class="muted small">Launch pricing (proposed). Fixed price, paid upfront. Checkout opens soon; until then, request a tier and we\'ll reply with a written scope.</p>'
+
+def form(fid, endpoint, fields, button):
+    f = "".join(fields)
+    return f'''<form class="card form" id="{fid}" data-endpoint="{e(endpoint)}" method="post" novalidate>{f}
+<button class="btn" type="submit">{e(button)}</button><p class="form-status" role="status" aria-live="polite"></p></form>'''
+def inp(name, label, typ="text", req=True, ph=""):
+    r = " required" if req else ""
+    return f'<label>{e(label)}{"" if req else " <span class=muted>(optional)</span>"}<input name="{name}" type="{typ}" placeholder="{e(ph)}"{r}></label>'
+def ta(name, label, req=False, ph=""):
+    r = " required" if req else ""
+    return f'<label>{e(label)}<textarea name="{name}" rows="4" placeholder="{e(ph)}"{r}></textarea></label>'
+def sel(name, label, opts):
+    return f'<label>{e(label)}<select name="{name}">' + "".join(f"<option>{e(o)}</option>" for o in opts) + '</select></label>'
+HONEYPOT = '<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">'
+
+def page(path, title, desc, body, ld=None):
+    url = SITE + path
+    graph = [ORG] + (ld or [])
+    nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path else ""}>{t}</a>' for h,t in NAV)
+    doc = f'''<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{e(title)}</title><meta name="description" content="{e(desc)}">{"" if path.endswith(".html") else f'<link rel="canonical" href="{url}">'}
+<meta property="og:type" content="website"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
+<meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":graph})}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap">{body}</main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>'''
+    if path.endswith(".html"):
+        fn = os.path.join(OUT, path.strip("/"))
+    else:
+        d = os.path.join(OUT, path.strip("/")); os.makedirs(d, exist_ok=True); fn = os.path.join(d, "index.html")
+    open(fn, "w").write(doc)
+
+LK_FAQ = [("What is the Prompt-to-Launch Kit?","A fixed-price package that turns your idea into a live one-page landing site on your own domain, with a waitlist or email capture, analytics, basic branding, and launch copy."),
+ ("How long does it take?","72 hours for Starter, 4 business days for Standard, and 5 business days for Plus, counted from when your intake form is complete."),
+ ("Do I own the site and domain?","Yes. You own the domain, the accounts, and the code. The repo or project is handed over at delivery."),
+ ("What is not included?","Multi-page sites, custom backends, payments beyond a hosted checkout link, and paid ads.")]
+RS_FAQ = [("What is Vibe-Coded App Rescue?","An audit-and-fix service for apps built with AI tools like Cursor, Lovable, Bolt, Replit, v0, or Claude Code. It covers deploy and hosting, auth and roles, security, bugs, and performance."),
+ ("What does the $99 Health Scan include?","An automated and agent-reviewed audit with a severity-ranked report and evidence, delivered in 48 hours. The $99 is credited toward a Fix Sprint or Launch-Ready tier."),
+ ("How are fixes delivered?","As pull requests to your repository, with a plain-English handover note. You approve and merge; nothing is merged to production without your approval."),
+ ("Do you need my production credentials?","Access is read-only by default and least-privilege. Credentials are never stored in chat or the repo, and access is revoked at handover."),
+ ("What if my app needs a full rebuild?","Full rebuilds and migrations are out of scope. The Scan says when a rebuild makes more sense, and those jobs are quoted separately or referred out.")]
+AG_FAQ = [("What agents do you set up?","The starting catalog is Inbox Triage, Content Repurposing, and Lead Research. Each agent is built for one job."),
+ ("Whose accounts does the agent run on?","Yours. Agents run on accounts you own, and you pay model and API usage directly."),
+ ("Can an agent send messages or spend money for me?","Only with a human-approval step that you control."),
+ ("What does the retainer cover?","Monitoring, fixes when models or APIs change, prompt and eval tuning, and a set number of improvements each month, depending on tier. Retainers are month-to-month.")]
+GEN_FAQ = [("What is Obrainsights?","A productized services business for solo builders that turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it."),
+ ("Who does the work?","AI agents handle intake, scoping, delivery, QA, and follow-up. A human (founder Matt Keller) approves pricing exceptions, credentials, payments, and final sign-off."),
+ ("Are prices fixed?","Yes. Every tier has a fixed price and written scope, paid upfront. Work beyond a tier gets a fixed-price change order, never hourly billing."),
+ ("Who owns the code and accounts?","You do. Customers own all accounts, domains, and code.")]
+
+LK_T = [("Starter","$299","Landing page, waitlist, domain/DNS help, analytics, 1 revision","72 hours"),
+        ("Standard","$599","Starter plus branding basics and a launch copy pack, 2 revisions","4 business days"),
+        ("Plus","$999","Standard plus a Product Hunt kit, OG/social assets, and a demo video script","5 business days")]
+RS_T = [("Health Scan","$99","Automated + agent-reviewed audit, severity-ranked report. Credited toward a fix.","48 hours"),
+        ("Fix Sprint","$750","Up to 5 critical/high issues fixed, PRs + handover, 7-day support","5 business days"),
+        ("Launch-Ready","$1,950","Up to 12 issues + production deploy, auth/payments verified, 14-day support","10 business days")]
+AG_T = [("Single Agent","$1,200 setup","One agent from the catalog, runbook, monitoring","5–7 business days"),
+        ("Agent Pack","$2,900 setup","Three agents, shared dashboard","10 business days")]
+RT_T = [("Care","$249/mo per agent","Monitoring, break-fix, monthly health report","Ongoing"),
+        ("Ops","$599/mo (up to 3 agents)","Care + 1 improvement/month + 48-hour response","Ongoing"),
+        ("Pro","$1,200/mo (up to 6 agents)","Ops + 3 improvements/month + priority response","Ongoing")]
+
+def num(p): return p.replace("$","").replace(",","").split()[0].split("/")[0]
+
+HOW = '''<section><h2>How it works</h2><ol class="steps">
+<li><b>Tell us what you have.</b> An idea, a prompt, or a repo. Fill in a short intake form.</li>
+<li><b>Get a fixed scope and price.</b> Written before you pay. No hourly billing.</li>
+<li><b>Agents build, a human verifies.</b> AI agents do the delivery work; credentials, payments, and final sign-off go through a human checkpoint.</li>
+<li><b>You own everything.</b> Code, domain, and accounts stay yours. Changes arrive as pull requests.</li></ol></section>'''
+
+# Home
+page("/", "Obrainsights: From Prompt to Live, Working Product",
+ "Fixed-price launch kits, vibe-coded app rescue, and done-for-you AI agents for solo builders. Agent-delivered, human-verified.",
+ f'''<section class="hero"><p class="eyebrow">For vibe coders, indie hackers, creators, and game devs</p>
+<h1>From prompt to <span class="accent">live, working product.</span></h1>
+<p class="lead">Obrainsights turns an idea, a prompt, or a half-broken AI-built app into something real people can use, then sets up the AI agents that help you run it.</p>
+<div class="cta"><a class="btn" href="/scan/">Get a free app scan</a><a class="btn ghost" href="/pricing/">See pricing</a></div></section>
+<section><h2>Three services, one path</h2><div class="grid3">
+<a class="card svc" href="/launch-kit/"><span class="tag">From $299</span><h3>Prompt-to-Launch Kit</h3><p>A live landing page on your domain with a waitlist, analytics, branding basics, and launch copy. 72 hours to 5 business days.</p></a>
+<a class="card svc" href="/rescue/"><span class="tag">Scan $99</span><h3>Vibe-Coded App Rescue</h3><p>Your Cursor, Lovable, Bolt, or Replit app works in the demo but not in production. We audit it and fix it with pull requests.</p></a>
+<a class="card svc" href="/agents/"><span class="tag">From $1,200</span><h3>Agent Setup Concierge</h3><p>Done-for-you AI agents for one job each: inbox triage, content repurposing, or lead research. Optional monthly care.</p></a>
+</div></section>
+<section><h2>Common problems we fix</h2><ul class="checks">
+<li>Auth loops and broken role checks</li><li>Exposed API keys and missing Supabase RLS or Firebase rules</li><li>Deploys that fail outside the AI tool</li><li>Stripe webhooks that never fire</li><li>An AI assistant stuck fixing the same bug</li><li>No time to set up domain, DNS, and a waitlist</li></ul></section>
+{HOW}
+{faq_html(GEN_FAQ)}
+<section class="band card"><h2>Not sure where to start?</h2><p>Run the free app scan. You'll get a short report by email with what to fix first.</p><a class="btn" href="/scan/">Start the free scan</a></section>''',
+ [faq_ld(GEN_FAQ)])
+
+def svc_page(path, title, desc, h1, lead, scope, deliver, out, tiersrows, faqs, sname, cta):
+    extra = f'<section><h2>Retainers</h2>{tiers(RT_T)}</section>' if path=="/agents/" else ""
+    page(path, title, desc, f'''<section class="hero sm"><p class="eyebrow">{e(sname)}</p><h1>{h1}</h1><p class="lead">{e(lead)}</p><div class="cta">{cta}</div></section>
+<section class="grid2"><div class="card"><h2>Scope</h2><p>{e(scope)}</p></div><div class="card"><h2>Deliverables</h2><p>{e(deliver)}</p></div></section>
+<section><h2>Tiers</h2>{tiers(tiersrows)}</section>{extra}
+<section><h2>Out of scope</h2><p>{e(out)}</p></section>{faq_html(faqs)}''',
+    [service_ld(sname, desc, path, [(n, num(p)) for n,p,_,_ in tiersrows] + ([(n, num(p)) for n,p,_,_ in RT_T] if path=="/agents/" else [])), faq_ld(faqs)])
+
+svc_page("/launch-kit/","Prompt-to-Launch Kit: Landing Page + Waitlist in 72 Hours | Obrainsights",
+ "Fixed-price launch kit for solo builders: landing page on your domain, waitlist, analytics, branding, and launch copy. $299–$999.",
+ 'Your idea, <span class="accent">live in 72 hours.</span>',
+ "A one-page landing site on your domain with everything you need to start collecting signups and announce your launch.",
+ "One-page landing site, help connecting your domain and DNS (you own the domain), a waitlist or email capture, basic branding (wordmark, colors, fonts, favicon, social card), and launch copy (headline, one X thread, a Reddit/Discord post, a Product Hunt tagline).",
+ "A live URL on your domain, the repo or project handed over, analytics connected, a launch copy doc, and a one-page brand sheet.",
+ "Multi-page sites, custom backends, payments beyond a hosted checkout link, and paid ads.", LK_T, LK_FAQ, "Prompt-to-Launch Kit",
+ '<a class="btn" href="/contact/">Start a Launch Kit</a><a class="btn ghost" href="/pricing/">Compare tiers</a>')
+svc_page("/rescue/","Vibe-Coded App Rescue: Fix AI-Built Apps | Obrainsights",
+ "Audit and fix apps built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code. $99 Health Scan, $750 Fix Sprint, $1,950 Launch-Ready.",
+ 'The demo works. <span class="accent">Production doesn\'t.</span> Let\'s fix that.',
+ "We audit and fix AI-built apps across deploy, auth, security, bugs, and performance, and deliver every fix as a pull request you approve.",
+ "Audit and fix AI-built apps in five areas: deploy/hosting, auth and roles, security (secrets, Supabase RLS/Firebase rules, input validation), bugs, and performance.",
+ "A scored Health Scan report (problems ranked by severity, with evidence), fixes delivered as pull requests to your repo, a plain-English handover note, and a short support window after delivery.",
+ "Full rebuilds and migrations. The Scan says when an app should be rebuilt; those jobs are quoted separately or referred out.", RS_T, RS_FAQ, "Vibe-Coded App Rescue",
+ '<a class="btn" href="/scan/">Try the free scan</a><a class="btn ghost" href="/contact/">Book a $99 Health Scan</a>')
+svc_page("/agents/","Agent Setup Concierge: Done-for-You AI Agents | Obrainsights",
+ "Done-for-you AI agents for inbox triage, content repurposing, and lead research, running on your accounts. Setup from $1,200, care from $249/mo.",
+ 'AI agents that <span class="accent">actually do the job.</span>',
+ "We build single-job AI agents on accounts you own, document them, and keep them working when models and APIs change.",
+ "Done-for-you AI agents, each built for one job. Inbox Triage labels mail, drafts replies, and sends a daily digest. Content Repurposing turns a video or stream into clips, X threads, a newsletter, and Shorts captions. Lead Research builds and enriches prospect lists and drafts first-touch messages for you to approve.",
+ "A configured agent running on accounts you own, a runbook, a 30-minute async Loom walkthrough, and monitoring and alerting.",
+ "Model and API usage fees (you pay those directly), and any agent action that sends messages or spends money without a human-approval step.", AG_T, AG_FAQ, "Agent Setup Concierge",
+ '<a class="btn" href="/contact/">Pick an agent</a><a class="btn ghost" href="/pricing/">See retainers</a>')
+
+PR_FAQ = [("Why is pricing marked proposed?","These are launch prices, set at the low end of published comparable rates. They may change after the first customers; any price you are quoted in writing is the price you pay."),
+ ("How do I pay?","Fixed price, paid upfront via Stripe Checkout once your written scope is agreed."),
+ ("Are there any discounts?","The $99 Scan fee is credited toward a Fix tier. Launch Kit buyers get $100 off an App Rescue within 60 days. Agent setups include one free month of Care."),
+ ("What if I need more than my tier includes?","You get a fixed-price change order before any extra work starts. There is no hourly billing.")]
+def table(title, rows):
+    return f'<h3>{title}</h3><div class="tbl"><table><thead><tr><th>Tier</th><th>Price</th><th>Includes</th><th>Turnaround</th></tr></thead><tbody>' + "".join(f"<tr><td>{e(a)}</td><td><b>{e(b)}</b></td><td>{e(c)}</td><td>{e(d)}</td></tr>" for a,b,c,d in rows) + "</tbody></table></div>"
+page("/pricing/","Pricing: Launch Kits, App Rescue, AI Agents | Obrainsights",
+ "All Obrainsights tiers in one place: Launch Kit $299–$999, App Rescue from $99, Agent setup from $1,200, retainers from $249/mo.",
+ f'''<section class="hero sm"><p class="eyebrow">Launch pricing (proposed)</p><h1>Fixed prices. <span class="accent">No hourly billing.</span></h1><p class="lead">Every tier has a written scope before you pay. All prices in USD.</p></section>
+<section>{table('<a href="/launch-kit/">Prompt-to-Launch Kit</a>', LK_T)}{table('<a href="/rescue/">Vibe-Coded App Rescue</a>', RS_T)}{table('<a href="/agents/">Agent Setup Concierge</a>', AG_T)}{table('Agent retainers (month-to-month)', RT_T)}</section>
+<section class="card"><h2>Pricing rules</h2><ul class="checks"><li>Fixed price, paid upfront through Stripe.</li><li>The $99 Scan fee is credited toward a Fix tier.</li><li>Launch Kit buyers get $100 off a Rescue within 60 days.</li><li>Agent setups include one free month of Care.</li><li>Work beyond a tier gets a fixed-price change order.</li></ul></section>
+{faq_html(PR_FAQ)}''', [faq_ld(PR_FAQ)])
+
+SC_FAQ = [("What does the free scan check?","A limited set of checks on a public URL or public repository, such as exposed secrets, basic security headers, and obvious deploy or config problems. The paid $99 Health Scan goes much deeper."),
+ ("How do I get the results?","By email. Free scans are reviewed before the report is sent."),
+ ("Do you need access to my code?","No. Submit a public URL or public repo only. Never paste passwords, API keys, or private credentials into this form.")]
+page("/scan/","Free App Scan for Vibe-Coded Apps | Obrainsights",
+ "Submit your app URL or public repo for a free mini security and health scan. Get a short report by email with what to fix first.",
+ f'''<section class="hero sm"><p class="eyebrow">Free tool</p><h1>Free <span class="accent">app scan</span></h1><p class="lead">Built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code? Send us a public URL or repo and get a short report by email.</p></section>
+<section class="grid2"><div>{form("scan-form", SCAN_ENDPOINT, [HONEYPOT, inp("email","Email","email",ph="you@example.com"), inp("app_url","App URL","url",ph="https://yourapp.com"), inp("repo_url","Public repo URL","url",False,"https://github.com/you/app"), sel("built_with","Built with",["Cursor","Lovable","Bolt","Replit","v0","Claude Code","Other / mixed"]), ta("problem","What's going wrong?",ph="e.g. login loops after deploy"), '<p class="muted small">Never include passwords, API keys, or private credentials.</p>'], "Request my free scan")}</div>
+<div class="card"><h2>What happens next</h2><ol class="steps"><li>We run a limited automated scan on what you submit.</li><li>The results are reviewed before anything is sent.</li><li>You get a short report by email with issues ranked by severity.</li><li>If you want fixes, the <a href="/rescue/">$99 Health Scan</a> goes deeper and is credited toward a fix.</li></ol></div></section>
+{faq_html(SC_FAQ)}''', [faq_ld(SC_FAQ)])
+
+page("/newsletter/","Newsletter for AI Builders and Vibe Coders | Obrainsights",
+ "A practical newsletter for vibe coders and AI builders: what breaks in AI-built apps, how to fix it, and useful agent setups.",
+ f'''<section class="hero sm"><p class="eyebrow">Newsletter</p><h1>Ship it, <span class="accent">then make it hold.</span></h1><p class="lead">Practical notes for vibe coders and AI builders: what breaks in AI-built apps, how to fix it, launch checklists, and agent setups that work. No spam; unsubscribe anytime.</p></section>
+<section class="narrow">{form("newsletter-form", NEWSLETTER_ENDPOINT, [HONEYPOT, inp("email","Email","email",ph="you@example.com")], "Subscribe")}</section>''')
+
+page("/about/","About Obrainsights | Agent-Delivered, Human-Verified",
+ "Obrainsights is an AI-agent-run productized services business founded by Matt Keller, with human checkpoints for credentials, payments, and sign-off.",
+ f'''<section class="hero sm"><p class="eyebrow">About</p><h1>An agent-run business, <span class="accent">with a human in the loop.</span></h1></section>
+<section class="prose"><p>Obrainsights is a productized services business for solo builders: vibe coders, indie hackers, creators, streamers, and indie game devs. We take an idea, a prompt, or a half-broken AI-built app to a live, working product, then set up the AI agents that help run it.</p>
+<p>The business is operated by AI agents that handle intake, scoping, delivery, QA, and follow-up. <b>Matt Keller</b> is the founder and the human in the loop. He approves custom quotes, refunds, access to production credentials, anything touching payments or personal data, and anything published under his name.</p>
+<h2>How we work</h2><ul class="checks"><li>Fixed scopes and fixed prices, written before you pay.</li><li>Least-privilege, revocable access; credentials kept in a vault, never in chat or a repo.</li><li>Every change goes through a pull request you approve.</li><li>You own all accounts, domains, and code.</li><li>We're open about the agent model and show where humans check the work.</li></ul>
+<p>This site was built with our own Launch Kit process.</p></section>''')
+
+page("/contact/","Contact Obrainsights",
+ "Request a Launch Kit, App Rescue, or Agent Setup, or ask a question. Every request gets a written fixed-price scope.",
+ f'''<section class="hero sm"><p class="eyebrow">Contact</p><h1>Tell us what you're <span class="accent">building.</span></h1><p class="lead">Pick a service and describe where you are. You'll get a written scope and fixed price before any payment.</p></section>
+<section class="narrow">{form("contact-form", CONTACT_ENDPOINT, [HONEYPOT, inp("name","Name"), inp("email","Email","email",ph="you@example.com"), sel("service","Interested in",["Prompt-to-Launch Kit","App Rescue: Health Scan","App Rescue: Fix Sprint / Launch-Ready","Agent Setup Concierge","Agent retainer","Something else"]), inp("link","Link to app, repo, or idea doc","url",False,"https://"), ta("message","Message",True,"What do you have, and what do you need?")], "Send")}</section>''')
+
+# 404
+page("/404.html","Page not found | Obrainsights","This page does not exist.",
+ '<section class="hero sm"><h1>404: <span class="accent">nothing here.</span></h1><p class="lead">That page doesn\'t exist. Try the <a href="/">home page</a> or the <a href="/scan/">free app scan</a>.</p></section>')
+
+# sitemap / robots / llms
+paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/"]
+open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>2026-10-14</lastmod></url>\n" for p in paths) + "</urlset>\n")
+open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
+open(os.path.join(OUT,"llms.txt"),"w").write(f"""# Obrainsights
+
+> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. Founder: Matt Keller. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
+
+## Services
+- [Prompt-to-Launch Kit]({SITE}/launch-kit/): one-page landing site on the customer's domain, waitlist, analytics, basic branding, launch copy.
+- [Vibe-Coded App Rescue]({SITE}/rescue/): audit and fix of apps built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code (deploy, auth, security, bugs, performance). Fixes delivered as pull requests.
+- [Agent Setup Concierge]({SITE}/agents/): done-for-you single-job AI agents (Inbox Triage, Content Repurposing, Lead Research) on customer-owned accounts, plus monthly retainers.
+- [Pricing]({SITE}/pricing/): all tiers.
+- [Free App Scan]({SITE}/scan/): free limited scan of a public URL or repo, report by email.
+
+## Prices
+Prompt-to-Launch Kit:
+{lt(LK_T)}
+
+Vibe-Coded App Rescue:
+{lt(RS_T)}
+
+Agent Setup Concierge:
+{lt(AG_T)}
+
+Retainers (month-to-month; customer pays model/API usage directly):
+{lt(RT_T)}
+
+Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; work beyond a tier gets a fixed-price change order, never hourly billing.
+
+## Policies
+- Customers own all accounts, domains, and code.
+- Least-privilege, revocable access; credentials are never stored in chat or repos.
+- Every change goes through a pull request the customer approves.
+- Full rebuilds and migrations are out of scope for App Rescue.
+
+## Optional
+- [About]({SITE}/about/)
+- [Contact]({SITE}/contact/)
+- [Newsletter]({SITE}/newsletter/)
+""")
+print("built", len(paths)+1, "pages")
