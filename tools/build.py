@@ -152,7 +152,7 @@ var b=document.getElementById("paid-fallback");b.hidden=false;document.getElemen
 # Home
 page("/", "Obrainsights: From Prompt to Live, Working Product",
  "Fixed-price launch kits, vibe-coded app rescue, and done-for-you AI agents for solo builders. Agent-delivered, human-verified.",
- f'''<section class="hero"><p class="eyebrow">Human-led AI implementation for the real world</p>
+ f'''<section class="hero home"><p class="eyebrow">Human-led AI implementation for the real world</p>
 <h1>From prompt to <span class="accent">live, working product.</span></h1>
 <p class="lead">At Obra Insights, we help businesses use AI as a practical tool to save time, cut wasted effort, and get real results, from a working app to AI agents that handle the busywork.</p>
 <div class="cta"><a class="btn" href="/scan/">Get a free app scan</a><a class="btn ghost" href="/pricing/">See pricing</a></div></section>
