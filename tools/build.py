@@ -5,12 +5,12 @@ SITE = "https://obrainsights.com"
 OUT = os.path.join(os.path.dirname(__file__), "..", "public")
 # TODO(endpoints): set these to real form endpoints (e.g. Formspree, Tally, Netlify Forms, Cloudflare Worker).
 # While empty, forms validate but show a "not connected yet" notice instead of pretending to submit.
-SCAN_ENDPOINT = ""        # TODO: free app scan intake endpoint
-NEWSLETTER_ENDPOINT = ""  # TODO: newsletter provider endpoint (Beehiiv/ConvertKit)
-CONTACT_ENDPOINT = ""     # TODO: contact form endpoint
+SCAN_ENDPOINT = "/api/scan"        # Cloudflare Pages Function -> Resend -> info@
+# Newsletter: Beehiiv embed on /newsletter/ (https://obrainsights.beehiiv.com)
+CONTACT_ENDPOINT = "/api/contact"  # Cloudflare Pages Function -> Resend -> info@
 
 NAV = [("/launch-kit/","Launch Kit"),("/rescue/","App Rescue"),("/agents/","Agent Setup"),("/pricing/","Pricing"),("/about/","About")]
-ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/logo.svg",
+ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/logo.svg","email":"info@obrainsights.com","contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"info@obrainsights.com"},
        "founder":{"@type":"Person","name":"Matt Keller"},
        "description":"Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}
 
@@ -44,12 +44,12 @@ def sel(name, label, opts):
     return f'<label>{e(label)}<select name="{name}">' + "".join(f"<option>{e(o)}</option>" for o in opts) + '</select></label>'
 HONEYPOT = '<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">'
 
-def page(path, title, desc, body, ld=None):
+def page(path, title, desc, body, ld=None, pre=""):
     url = SITE + path
     graph = [ORG] + (ld or [])
     nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path else ""}>{t}</a>' for h,t in NAV)
     doc = f'''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{pre}<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">{"" if path.endswith(".html") else f'<link rel="canonical" href="{url}">'}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
@@ -62,7 +62,8 @@ def page(path, title, desc, body, ld=None):
 <footer class="foot"><div class="wrap cols">
 <div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
 <div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
-<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
 </div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
 <script src="/assets/forms.js" defer></script></body></html>'''
     if path.endswith(".html"):
@@ -166,7 +167,7 @@ PR_FAQ = [("Why is pricing marked proposed?","These are launch prices, set at th
  ("Are there any discounts?","The $99 Scan fee is credited toward a Fix tier. Launch Kit buyers get $100 off an App Rescue within 60 days. Agent setups include one free month of Care."),
  ("What if I need more than my tier includes?","You get a fixed-price change order before any extra work starts. There is no hourly billing.")]
 def table(title, rows):
-    return f'<h3>{title}</h3><div class="tbl"><table><thead><tr><th>Tier</th><th>Price</th><th>Includes</th><th>Turnaround</th></tr></thead><tbody>' + "".join(f"<tr><td>{e(a)}</td><td><b>{e(b)}</b></td><td>{e(c)}</td><td>{e(d)}</td></tr>" for a,b,c,d in rows) + "</tbody></table></div>"
+    return f'<h2>{title}</h2><div class="tbl"><table><thead><tr><th>Tier</th><th>Price</th><th>Includes</th><th>Turnaround</th></tr></thead><tbody>' + "".join(f"<tr><td>{e(a)}</td><td><b>{e(b)}</b></td><td>{e(c)}</td><td>{e(d)}</td></tr>" for a,b,c,d in rows) + "</tbody></table></div>"
 page("/pricing/","Pricing: Launch Kits, App Rescue, AI Agents | Obrainsights",
  "All Obrainsights tiers in one place: Launch Kit $299–$999, App Rescue from $99, Agent setup from $1,200, retainers from $249/mo.",
  f'''<section class="hero sm"><p class="eyebrow">Launch pricing (proposed)</p><h1>Fixed prices. <span class="accent">No hourly billing.</span></h1><p class="lead">Every tier has a written scope before you pay. All prices in USD.</p></section>
@@ -187,7 +188,7 @@ page("/scan/","Free App Scan for Vibe-Coded Apps | Obrainsights",
 page("/newsletter/","Newsletter for AI Builders and Vibe Coders | Obrainsights",
  "A practical newsletter for vibe coders and AI builders: what breaks in AI-built apps, how to fix it, and useful agent setups.",
  f'''<section class="hero sm"><p class="eyebrow">Newsletter</p><h1>Ship it, <span class="accent">then make it hold.</span></h1><p class="lead">Practical notes for vibe coders and AI builders: what breaks in AI-built apps, how to fix it, launch checklists, and agent setups that work. No spam; unsubscribe anytime.</p></section>
-<section class="narrow">{form("newsletter-form", NEWSLETTER_ENDPOINT, [HONEYPOT, inp("email","Email","email",ph="you@example.com")], "Subscribe")}</section>''')
+<section class="narrow"><div class="card beehiiv-embed"><script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="118a4bdf-32cb-4e2b-8382-c0beb710ea12"></script><noscript><p>Subscribe at <a href="https://obrainsights.beehiiv.com/subscribe">obrainsights.beehiiv.com/subscribe</a>.</p></noscript></div><p class="muted small">Prefer a direct link? <a href="https://obrainsights.beehiiv.com/subscribe">Subscribe on Beehiiv</a>.</p></section>''')
 
 page("/about/","About Obrainsights | Agent-Delivered, Human-Verified",
  "Obrainsights is an AI-agent-run productized services business founded by Matt Keller, with human checkpoints for credentials, payments, and sign-off.",
@@ -199,16 +200,45 @@ page("/about/","About Obrainsights | Agent-Delivered, Human-Verified",
 
 page("/contact/","Contact Obrainsights",
  "Request a Launch Kit, App Rescue, or Agent Setup, or ask a question. Every request gets a written fixed-price scope.",
- f'''<section class="hero sm"><p class="eyebrow">Contact</p><h1>Tell us what you're <span class="accent">building.</span></h1><p class="lead">Pick a service and describe where you are. You'll get a written scope and fixed price before any payment.</p></section>
+ f'''<section class="hero sm"><p class="eyebrow">Contact</p><h1>Tell us what you're <span class="accent">building.</span></h1><p class="lead">Pick a service and describe where you are. You'll get a written scope and fixed price before any payment.</p><p class="lead">Prefer email? Write to <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>.</p></section>
 <section class="narrow">{form("contact-form", CONTACT_ENDPOINT, [HONEYPOT, inp("name","Name"), inp("email","Email","email",ph="you@example.com"), sel("service","Interested in",["Prompt-to-Launch Kit","App Rescue: Health Scan","App Rescue: Fix Sprint / Launch-Ready","Agent Setup Concierge","Agent retainer","Something else"]), inp("link","Link to app, repo, or idea doc","url",False,"https://"), ta("message","Message",True,"What do you have, and what do you need?")], "Send")}</section>''')
+
+
+DRAFT = "<!-- DRAFT FOR MATT'S REVIEW: not legal advice; replace [LLC name], [state], and confirm refund terms before launch. -->"
+UPD = "October 16, 2026"
+def legal_page(path, title, desc, h1, sections):
+    body = f'<section class="hero sm"><p class="eyebrow">Legal (draft)</p><h1>{h1}</h1><p class="muted">Last updated: {UPD}. Draft pending review.</p></section><section class="prose">' + "".join(f"<h2>{e(h)}</h2>" + "".join(f"<p>{x}</p>" for x in ps) for h,ps in sections) + '<p>Questions: <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>.</p></section>'
+    page(path, title, desc, body, pre=DRAFT+"\n")
+LLC = "Obrainsights [LLC name]"
+legal_page("/terms/","Terms of Service | Obrainsights","Terms for Obrainsights services: Launch Kits, App Rescue, and Agent Setup.","Terms of <span class=\"accent\">Service</span>",[
+ ("Who we are",[f'These terms are an agreement between you and {LLC}, a [state] limited liability company ("Obrainsights", "we"). By using obrainsights.com or buying a service, you agree to them.']),
+ ("Services",["We offer fixed-scope productized services: the Prompt-to-Launch Kit, Vibe-Coded App Rescue, and Agent Setup Concierge, plus optional monthly retainers. Work is performed largely by AI agents and reviewed by a human. Each engagement is defined by a written scope agreed before payment; if the scope and these terms conflict, the written scope controls."]),
+ ("Payments",["Prices are in USD and are paid upfront through Stripe. We never see or store your full card details; Stripe processes payments under its own terms and privacy policy. Retainers renew monthly until cancelled; you can cancel any time before the next billing date and keep service through the end of the paid period."]),
+ ("Refunds",["If we have not started work, you can request a full refund. Once work has started, if we fail to deliver the agreed scope we will fix it or refund the undelivered portion. The $99 Health Scan is non-refundable once the report is delivered, but it is credited toward a Fix tier. Request refunds at info@obrainsights.com. [Confirm refund policy.]"]),
+ ("Your responsibilities",["You confirm you have the right to share any code, accounts, or content you give us, and you grant us the limited, revocable access needed to do the work. You pay third-party fees (hosting, domains, model and API usage) directly."]),
+ ("Ownership",["When you have paid in full, you own the deliverables, code, domains, and accounts we set up for you. We may reuse general know-how and non-confidential templates."]),
+ ("Free scan and newsletter",["The free app scan is provided as-is and is limited to public URLs and repositories. It is not a full security audit. The newsletter is free and you can unsubscribe at any time."]),
+ ("Disclaimers and liability",["Services are provided with reasonable skill, but we do not guarantee your app will be free of bugs or security issues. To the extent the law allows, our total liability for any claim is limited to the amount you paid us for the service in question, and we are not liable for indirect or consequential losses."]),
+ ("Changes and governing law",["We may update these terms; the version in effect when you buy applies to that purchase. These terms are governed by the laws of [state], USA."]),
+])
+legal_page("/privacy/","Privacy Policy | Obrainsights","How Obrainsights collects and uses data from forms, the newsletter, payments, and hosting.","Privacy <span class=\"accent\">Policy</span>",[
+ ("Who we are",[f"{LLC} operates obrainsights.com. Contact us at info@obrainsights.com about anything in this policy."]),
+ ("What we collect",["Contact and scan forms: your name, email, links you submit, and your message. Newsletter: your email and basic engagement data. Purchases: billing details handled by Stripe. Hosting: standard technical logs such as IP address and browser type."]),
+ ("Service providers",['Form submissions are delivered to our inbox by email through <a href="https://resend.com/legal/privacy-policy">Resend</a>. The newsletter runs on <a href="https://www.beehiiv.com/privacy">Beehiiv</a>. Payments are processed by <a href="https://stripe.com/privacy">Stripe</a>; we never receive your full card number. The site is hosted on <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a> Pages. Our email runs on Google Workspace. Each provider handles data under its own privacy policy.']),
+ ("How we use it",["To reply to you, deliver and scope services, send the newsletter you signed up for, process payments, and keep the site secure. We do not sell your personal information."]),
+ ("Retention",["We keep form and project records as long as needed to provide services and meet legal or tax obligations, then delete them. You can unsubscribe from the newsletter at any time with the link in every issue."]),
+ ("Your choices",["You can ask us to access, correct, or delete your personal data by emailing info@obrainsights.com. Depending on where you live (for example California or the EU), you may have additional rights, and we will honor them."]),
+ ("Children",["The site is not directed at children under 13, and we do not knowingly collect their data."]),
+ ("Changes",["We will post updates here and change the date at the top."]),
+])
 
 # 404
 page("/404.html","Page not found | Obrainsights","This page does not exist.",
  '<section class="hero sm"><h1>404: <span class="accent">nothing here.</span></h1><p class="lead">That page doesn\'t exist. Try the <a href="/">home page</a> or the <a href="/scan/">free app scan</a>.</p></section>')
 
 # sitemap / robots / llms
-paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/"]
-open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>2026-10-14</lastmod></url>\n" for p in paths) + "</urlset>\n")
+paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/"]
+open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>2026-10-16</lastmod></url>\n" for p in paths) + "</urlset>\n")
 open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
 open(os.path.join(OUT,"llms.txt"),"w").write(f"""# Obrainsights
@@ -245,7 +275,9 @@ Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $10
 
 ## Optional
 - [About]({SITE}/about/)
-- [Contact]({SITE}/contact/)
+- [Contact]({SITE}/contact/): email info@obrainsights.com
 - [Newsletter]({SITE}/newsletter/)
+- [Terms]({SITE}/terms/)
+- [Privacy]({SITE}/privacy/)
 """)
 print("built", len(paths)+1, "pages")

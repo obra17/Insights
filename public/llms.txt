@@ -39,5 +39,7 @@ Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $10
 
 ## Optional
 - [About](https://obrainsights.com/about/)
-- [Contact](https://obrainsights.com/contact/)
+- [Contact](https://obrainsights.com/contact/): email info@obrainsights.com
 - [Newsletter](https://obrainsights.com/newsletter/)
+- [Terms](https://obrainsights.com/terms/)
+- [Privacy](https://obrainsights.com/privacy/)
