@@ -58,5 +58,5 @@ th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-
 .prose pre{background:var(--sec);border-radius:8px;padding:14px 16px;overflow-x:auto;margin:1em 0;line-height:1.5}
 .prose pre code{background:none;padding:0;font-size:.85em;word-break:normal;white-space:pre}
 .prose h3{margin-top:1.4em}
-.foot-brand{margin-left:-6px}.foot-brand .oi{display:block;width:22px;height:22px;flex-shrink:0;margin-right:7px;border-radius:50%}
-@media(max-width:700px){.foot-brand{margin-left:0}.foot-brand .oi{width:20px;height:20px;margin-right:6px}}
+.foot-brand .oi{display:block;width:48px;height:48px;flex-shrink:0;margin-right:12px;border-radius:50%}
+@media(max-width:700px){.foot-brand .oi{width:40px;height:40px;margin-right:10px}}
