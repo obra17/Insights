@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leaked API Keys in Lovable, Bolt and Cursor Apps | Obrainsights</title><meta name="description" content="How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed."><link rel="canonical" href="https://obrainsights.com/blog/api-keys-leaking-ai-apps/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="Leaked API Keys in Lovable, Bolt and Cursor Apps | Obrainsights">
+<meta property="og:description" content="How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed."><meta property="og:url" content="https://obrainsights.com/blog/api-keys-leaking-ai-apps/"><meta property="og:image" content="https://obrainsights.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Leaked API Keys in Lovable, Bolt and Cursor Apps | Obrainsights"><meta name="twitter:description" content="How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed."><meta name="twitter:image" content="https://obrainsights.com/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://obrainsights.com/#org", "name": "Obrainsights", "url": "https://obrainsights.com/", "logo": "https://obrainsights.com/assets/logo.svg", "email": "info@obrainsights.com", "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "info@obrainsights.com"}, "founder": {"@type": "Person", "name": "Matt Keller"}, "description": "Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}, {"@type": "Article", "headline": "Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them", "description": "How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed.", "datePublished": "2026-10-17", "dateModified": "2026-10-17", "author": {"@type": "Person", "name": "Matt Keller", "url": "https://obrainsights.com/about/"}, "publisher": {"@id": "https://obrainsights.com/#org"}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://obrainsights.com/blog/api-keys-leaking-ai-apps/"}, "image": "https://obrainsights.com/assets/og.png", "inLanguage": "en"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://obrainsights.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://obrainsights.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them", "item": "https://obrainsights.com/blog/api-keys-leaking-ai-apps/"}]}]}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav><a href="/launch-kit/">Launch Kit</a><a href="/rescue/">App Rescue</a><a href="/agents/">Agent Setup</a><a href="/pricing/">Pricing</a><a href="/blog/" aria-current=page>Blog</a><a href="/about/">About</a><a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap"><article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · 7 min read</p><h1>Your API keys are probably <span class="accent">more public than you think.</span></h1><p class="muted">By Matt Keller · <time datetime="2026-10-17">October 17, 2026</time></p></section>
+<section class="prose">
+<p>AI coding tools are very good at making things work. They are less careful about <em>where</em> secrets end up. A common pattern: the app calls OpenAI or Stripe straight from the browser, the key sits in a <code>VITE_</code> variable, and the first person to open DevTools can copy it. The bill arrives a few days later.</p>
+<p>Here's how keys leak from vibe-coded apps, how to check yours in about ten minutes, and what to do if you find one.</p>
+
+<h2>Public keys vs. secret keys</h2>
+<p>Not every key in your frontend is a problem. Some are meant to be public:</p>
+<ul>
+<li><b>Fine in the browser:</b> the Supabase anon (or publishable) key, the Stripe publishable key (<code>pk_live_</code>/<code>pk_test_</code>), Firebase web config, and analytics IDs. These are only safe if your database rules are right; see our <a href="/blog/supabase-rls-auth-mistakes/">Supabase RLS guide</a>.</li>
+<li><b>Never in the browser:</b> Stripe secret keys (<code>sk_live_</code>, <code>rk_live_</code>), the Supabase <code>service_role</code> key, OpenAI or Anthropic keys (<code>sk-</code>, <code>sk-proj-</code>, <code>sk-ant-</code>), AWS keys (<code>AKIA</code>...), email API keys like Resend (<code>re_</code>) or SendGrid (<code>SG.</code>), and webhook signing secrets (<code>whsec_</code>).</li>
+</ul>
+
+<h2>How keys leak</h2>
+<h3>1. The public prefix</h3>
+<p>Vite apps (most Lovable and Bolt projects) expose any variable starting with <code>VITE_</code> to the browser. Next.js does the same for <code>NEXT_PUBLIC_</code>. When an assistant hits "undefined" for a secret, the fastest fix is adding that prefix. It works, and it publishes the secret in your JavaScript bundle.</p>
+<h3>2. The committed <code>.env</code> file</h3>
+<p>If <code>.env</code> isn't in <code>.gitignore</code> before your first commit, it goes to GitHub with everything else. Making the repo private later doesn't help if it was ever public, and deleting the file doesn't remove it from git history.</p>
+<h3>3. Hard-coded keys</h3>
+<p>Sometimes the key is pasted right into a component, like <code>const openai = new OpenAI({ apiKey: "sk-..." })</code>, often because you pasted it into the chat and the assistant used it directly.</p>
+<h3>4. Logs, errors, and screenshots</h3>
+<p>Keys also show up in <code>console.log</code> output, error messages returned to the browser, demo videos, livestreams, and screenshots shared on X when asking for help.</p>
+
+<h2>Check your app in ten minutes</h2>
+<ol>
+<li><b>Search the live site.</b> Open your deployed app, open DevTools, go to Sources (Chrome) or Debugger (Firefox), and search all files (Ctrl/Cmd+Shift+F) for <code>sk_live</code>, <code>sk-</code>, <code>service_role</code>, <code>AKIA</code>, <code>re_</code>, and <code>whsec_</code>.</li>
+<li><b>Search the build.</b> Run <code>npm run build</code>, then search the output folder: <code>grep -rE "sk_live|sk-|service_role|AKIA|whsec_" dist/</code> (or <code>.next/</code>). To catch a <code>service_role</code> key, decode any JWT you find and check its <code>role</code> claim.</li>
+<li><b>Search the repo, including history.</b> <code>git log -p | grep -E "sk_live|sk-|service_role"</code> is a quick check. Tools like gitleaks or trufflehog do a thorough one. On GitHub, turn on secret scanning and push protection for the repo.</li>
+<li><b>Check every prefixed variable.</b> List every <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable in your <code>.env</code> and host settings. Each one should be something you'd be comfortable printing on your homepage.</li>
+</ol>
+
+<h2>If you find a leaked key</h2>
+<ol>
+<li><b>Rotate it first.</b> Create a new key in the provider's dashboard and revoke the old one. Removing it from your code doesn't help if it's already been copied, and bots scan GitHub for new keys within minutes.</li>
+<li><b>Check usage.</b> Look at the provider's usage and billing pages for activity you don't recognize, and set spend limits or budget alerts where the provider offers them.</li>
+<li><b>Move the call to the server.</b> Anything that needs a secret belongs in a server function: a Supabase Edge Function, a Vercel or Netlify function, or a Cloudflare Worker. The browser calls your function; your function holds the key and calls the provider.</li>
+<li><b>Store the secret in the right place.</b> Put it in your host's environment settings or your Edge Function secrets, never in a prefixed variable and never in the repo.</li>
+<li><b>Restrict what's left.</b> Use restricted Stripe keys with only the permissions you need, and lock Google API keys to your domain.</li>
+</ol>
+
+<h2>Keep it from happening again</h2>
+<ul>
+<li>Add <code>.env*</code> to <code>.gitignore</code> on day one and commit a <code>.env.example</code> with blank values instead.</li>
+<li>Tell your assistant up front: "Never put secret keys in client code or in VITE_ or NEXT_PUBLIC_ variables. Use a server function." Put that line in your project rules file.</li>
+<li>In Cursor, add <code>.env</code> to <code>.cursorignore</code> so it isn't sent to the AI as context.</li>
+<li>Don't paste live keys into AI chats. Use placeholder values and add the real ones in your host's dashboard.</li>
+</ul>
+
+<h2>Want someone to check?</h2>
+<p>Our <a href="/scan/">free app scan</a> looks at a public URL or public repo for exposed secrets and obvious config problems, and emails you what to fix first. If something turns up, a <a href="/rescue/">$149 Quick Fix</a> moves one leaky integration behind a server function, or the <a href="/rescue/">$99 Health Scan</a> audits the whole app. If your deploy is also failing, start with <a href="/blog/ai-app-wont-deploy/">our deploy checklist</a>.</p>
+</section></article><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>

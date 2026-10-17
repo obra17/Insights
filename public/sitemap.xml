@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://obrainsights.com/</loc><lastmod>2026-10-16</lastmod></url>
-  <url><loc>https://obrainsights.com/launch-kit/</loc><lastmod>2026-10-16</lastmod></url>
-  <url><loc>https://obrainsights.com/rescue/</loc><lastmod>2026-10-16</lastmod></url>
-  <url><loc>https://obrainsights.com/agents/</loc><lastmod>2026-10-16</lastmod></url>
-  <url><loc>https://obrainsights.com/pricing/</loc><lastmod>2026-10-16</lastmod></url>
+  <url><loc>https://obrainsights.com/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/launch-kit/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/rescue/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/agents/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/pricing/</loc><lastmod>2026-10-17</lastmod></url>
   <url><loc>https://obrainsights.com/scan/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/newsletter/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/about/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/contact/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/terms/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/privacy/</loc><lastmod>2026-10-16</lastmod></url>
-  <url><loc>https://obrainsights.com/blog/</loc><lastmod>2026-10-16</lastmod></url>
+  <url><loc>https://obrainsights.com/blog/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/blog/supabase-rls-auth-mistakes/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/blog/api-keys-leaking-ai-apps/</loc><lastmod>2026-10-17</lastmod></url>
+  <url><loc>https://obrainsights.com/blog/first-ai-agent-small-business/</loc><lastmod>2026-10-17</lastmod></url>
   <url><loc>https://obrainsights.com/blog/ai-app-wont-deploy/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/blog/fix-broken-vibe-coded-app/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://obrainsights.com/blog/launch-ai-app-from-prompt/</loc><lastmod>2026-10-16</lastmod></url>

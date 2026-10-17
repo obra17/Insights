@@ -3,7 +3,21 @@
 import json, os, html, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://obrainsights.com"
-OUT = os.path.join(os.path.dirname(__file__), "..", "public")
+OUT = os.environ.get("OBRA_OUT") or os.path.join(os.path.dirname(__file__), "..", "public")
+# Buy buttons (Stripe Payment Links) are OFF by default. Production builds never set SHOW_BUY.
+# Preview only: SHOW_BUY=1 OBRA_OUT=/tmp/obra-preview python3 tools/build.py
+# Live (after Stripe activation): SHOW_BUY=1 STRIPE_LIVE=1 python3 tools/build.py  -> uses tools/stripe_live_links.json,
+# no test banner, normal indexing. Without STRIPE_LIVE, SHOW_BUY builds are test previews (banner + noindex).
+SHOW_BUY = os.environ.get("SHOW_BUY") == "1"
+STRIPE_LIVE = SHOW_BUY and os.environ.get("STRIPE_LIVE") == "1"
+TEST_PREVIEW = SHOW_BUY and not STRIPE_LIVE
+_links_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stripe_live_links.json" if STRIPE_LIVE else "stripe_test_links.json")
+STRIPE_LINKS = {k:v for k,v in json.load(open(_links_file)).items() if not k.startswith("_")} if SHOW_BUY else {}
+if STRIPE_LIVE: assert all("/test_" not in u for u in STRIPE_LINKS.values()), "live build with test links"
+if TEST_PREVIEW and OUT == os.path.join(os.path.dirname(__file__), "..", "public"): sys.exit("refusing: test-checkout preview must use OBRA_OUT, not public/")
+def buy(name, cls="btn"):
+    u = STRIPE_LINKS.get(name)
+    return f'<a class="{cls}" href="{e(u)}" rel="nofollow">Buy now</a>' if u else ""
 # TODO(endpoints): set these to real form endpoints (e.g. Formspree, Tally, Netlify Forms, Cloudflare Worker).
 # While empty, forms validate but show a "not connected yet" notice instead of pretending to submit.
 SCAN_ENDPOINT = "/api/scan"        # Cloudflare Pages Function -> Resend -> info@
@@ -23,13 +37,20 @@ def faq_ld(faqs):
     return {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faqs]}
 def service_ld(name, desc, path, offers):
     return {"@type":"Service","name":name,"description":desc,"url":SITE+path,"provider":{"@id":SITE+"/#org"},"areaServed":"Worldwide",
-            "offers":[{"@type":"Offer","name":n,"price":p,"priceCurrency":"USD"} for n,p in offers]}
+            "offers":[offer_ld(n,p) for n,p in offers]}
+MONTHLY = {"Care","Ops","Pro"}
+def offer_ld(n, p):
+    o = {"@type":"Offer","name":n,"price":p,"priceCurrency":"USD"}
+    if n in MONTHLY:
+        o["priceSpecification"] = {"@type":"UnitPriceSpecification","price":p,"priceCurrency":"USD","unitText":"MONTH","billingDuration":"P1M"}
+    return o
 
 def tiers(rows):
     out = '<div class="tiers">'
     for name, price, inc, tat in rows:
-        out += f'<div class="card tier"><h3>{e(name)}</h3><p class="price">{e(price)}</p><p>{e(inc)}</p><p class="muted">Turnaround: {e(tat)}</p><a class="btn ghost" href="/contact/">Request this tier</a></div>'
-    return out + '</div><p class="muted small">Launch pricing (proposed). Fixed price, paid upfront. Checkout opens soon; until then, request a tier and we\'ll reply with a written scope.</p>'
+        out += f'<div class="card tier"><h3>{e(name)}</h3><p class="price">{e(price)}</p><p>{e(inc)}</p><p class="muted">Turnaround: {e(tat)}</p>{buy(name)}<a class="btn ghost" href="/contact/">Request this tier</a></div>'
+    note = "Pay securely with Stripe, or request a tier and we'll reply with a written scope first." if SHOW_BUY else "Checkout opens soon; until then, request a tier and we'll reply with a written scope."
+    return out + f'</div><p class="muted small">Launch pricing (proposed). Fixed price, paid upfront. {e(note)}</p>'
 
 def form(fid, endpoint, fields, button):
     f = "".join(fields)
@@ -45,7 +66,7 @@ def sel(name, label, opts):
     return f'<label>{e(label)}<select name="{name}">' + "".join(f"<option>{e(o)}</option>" for o in opts) + '</select></label>'
 HONEYPOT = '<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">'
 
-def page(path, title, desc, body, ld=None, pre="", og_type="website"):
+def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=False):
     url = SITE + path
     graph = [ORG] + (ld or [])
     nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path or (h=="/blog/" and path.startswith("/blog/")) else ""}>{t}</a>' for h,t in NAV)
@@ -55,11 +76,11 @@ def page(path, title, desc, body, ld=None, pre="", og_type="website"):
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
-<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
 <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":graph})}</script>
 </head><body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
-<main class="wrap">{body}</main>
+<main class="wrap">{'<p class="offer"><b>Preview with Stripe TEST checkout.</b> Buy buttons use Stripe test mode. Use card 4242 4242 4242 4242; no real charges.</p>' if TEST_PREVIEW else ''}{body}</main>
 <footer class="foot"><div class="wrap cols">
 <div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
 <div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
@@ -78,7 +99,8 @@ LK_FAQ = [("What is the Prompt-to-Launch Kit?","A fixed-price package that turns
  ("Do I own the site and domain?","Yes. You own the domain, the accounts, and the code. The repo or project is handed over at delivery."),
  ("What is not included?","Multi-page sites, custom backends, payments beyond a hosted checkout link, and paid ads.")]
 RS_FAQ = [("What is Vibe-Coded App Rescue?","An audit-and-fix service for apps built with AI tools like Cursor, Lovable, Bolt, Replit, v0, or Claude Code. It covers deploy and hosting, auth and roles, security, bugs, and performance."),
- ("What does the $99 Health Scan include?","An automated and agent-reviewed audit with a severity-ranked report and evidence, delivered in 48 hours. The $99 is credited toward a Fix Sprint or Launch-Ready tier."),
+ ("What is the $149 Quick Fix?","One specific bug or deploy issue, fixed and delivered as a pull request within 48 hours. Good when you already know what is broken. If the issue turns out to be bigger than one fix, we tell you before any work starts and quote a Fix Sprint instead."),
+ ("What does the $99 Health Scan include?","An automated and agent-reviewed audit with a severity-ranked report and evidence, delivered in 48 hours. The $99 is credited toward a Quick Fix, Fix Sprint, or Launch-Ready tier."),
  ("How are fixes delivered?","As pull requests to your repository, with a plain-English handover note. You approve and merge; nothing is merged to production without your approval."),
  ("Do you need my production credentials?","Access is read-only by default and least-privilege. Credentials are never stored in chat or the repo, and access is revoked at handover."),
  ("What if my app needs a full rebuild?","Full rebuilds and migrations are out of scope. The Scan says when a rebuild makes more sense, and those jobs are quoted separately or referred out.")]
@@ -95,6 +117,7 @@ LK_T = [("Starter","$299","Landing page, waitlist, domain/DNS help, analytics, 1
         ("Standard","$599","Starter plus branding basics and a launch copy pack, 2 revisions","4 business days"),
         ("Plus","$999","Standard plus a Product Hunt kit, OG/social assets, and a demo video script","5 business days")]
 RS_T = [("Health Scan","$99","Automated + agent-reviewed audit, severity-ranked report. Credited toward a fix.","48 hours"),
+        ("Quick Fix","$149","One specific bug or deploy issue fixed, delivered as a PR with a short handover note","48 hours"),
         ("Fix Sprint","$750","Up to 5 critical/high issues fixed, PRs + handover, 7-day support","5 business days"),
         ("Launch-Ready","$1,950","Up to 12 issues + production deploy, auth/payments verified, 14-day support","10 business days")]
 AG_T = [("Single Agent","$1,200 setup","One agent from the catalog, runbook, monitoring","5–7 business days"),
@@ -105,11 +128,23 @@ RT_T = [("Care","$249/mo per agent","Monitoring, break-fix, monthly health repor
 
 def num(p): return p.replace("$","").replace(",","").split()[0].split("/")[0]
 
+FOUNDING = "Founding customer offer: 30% off for our first 10 clients in exchange for a testimonial."
+def founding_html():
+    return f'<aside class="offer" aria-label="Founding customer offer"><p><b>{e(FOUNDING)}</b></p><p class="muted small">Applies to any package. Use code <b>FOUNDING30</b> at checkout for 30% off (first 10 customers; on retainers it covers the first month), or mention it when you request a written quote. In return, we ask for a short testimonial after delivery. Available while spots last.</p></aside>'
+
 HOW = '''<section><h2>How it works</h2><ol class="steps">
 <li><b>Tell us what you have.</b> An idea, a prompt, or a repo. Fill in a short intake form.</li>
 <li><b>Get a fixed scope and price.</b> Written before you pay. No hourly billing.</li>
 <li><b>Agents build, a human verifies.</b> AI agents do the delivery work; credentials, payments, and final sign-off go through a human checkpoint.</li>
 <li><b>You own everything.</b> Code, domain, and accounts stay yours. Changes arrive as pull requests.</li></ol></section>'''
+
+# Payment confirmation. Stripe Payment Links redirect to /thanks/?paid=<slug>.
+PRODUCTS = {"lk-starter":"Prompt-to-Launch Kit: Starter","lk-standard":"Prompt-to-Launch Kit: Standard","lk-plus":"Prompt-to-Launch Kit: Plus",
+ "rs-scan":"App Rescue: $99 Health Scan","rs-quickfix":"App Rescue: $149 Quick Fix","rs-sprint":"App Rescue: Fix Sprint","rs-launchready":"App Rescue: Launch-Ready",
+ "ag-single":"Agent Setup: Single Agent","ag-pack":"Agent Setup: Agent Pack (3 agents)","rt-care":"Care retainer","rt-ops":"Ops retainer","rt-pro":"Pro retainer"}
+PAID_FALLBACK = '''<div id="paid-fallback" class="offer" hidden><p><b>Payment received. Thank you!</b> <a id="paid-link" href="/thanks/">See your next steps</a>.</p></div>
+<script>(function(){var q=new URLSearchParams(location.search),s=q.get("paid");if(!s)return;var u="/thanks/?paid="+encodeURIComponent(s);
+var b=document.getElementById("paid-fallback");b.hidden=false;document.getElementById("paid-link").href=u;location.replace(u);})();</script>'''
 
 # Home
 page("/", "Obrainsights: From Prompt to Live, Working Product",
@@ -118,6 +153,7 @@ page("/", "Obrainsights: From Prompt to Live, Working Product",
 <h1>From prompt to <span class="accent">live, working product.</span></h1>
 <p class="lead">Obrainsights turns an idea, a prompt, or a half-broken AI-built app into something real people can use, then sets up the AI agents that help you run it.</p>
 <div class="cta"><a class="btn" href="/scan/">Get a free app scan</a><a class="btn ghost" href="/pricing/">See pricing</a></div></section>
+{founding_html()}
 <section><h2>Three services, one path</h2><div class="grid3">
 <a class="card svc" href="/launch-kit/"><span class="tag">From $299</span><h3>Prompt-to-Launch Kit</h3><p>A live landing page on your domain with a waitlist, analytics, branding basics, and launch copy. 72 hours to 5 business days.</p></a>
 <a class="card svc" href="/rescue/"><span class="tag">Scan $99</span><h3>Vibe-Coded App Rescue</h3><p>Your Cursor, Lovable, Bolt, or Replit app works in the demo but not in production. We audit it and fix it with pull requests.</p></a>
@@ -138,7 +174,7 @@ def svc_page(path, title, desc, h1, lead, scope, deliver, out, tiersrows, faqs, 
 <section><h2>Out of scope</h2><p>{e(out)}</p></section>{faq_html(faqs)}''',
     [service_ld(sname, desc, path, [(n, num(p)) for n,p,_,_ in tiersrows] + ([(n, num(p)) for n,p,_,_ in RT_T] if path=="/agents/" else [])), faq_ld(faqs)])
 
-svc_page("/launch-kit/","Prompt-to-Launch Kit: Landing Page + Waitlist in 72 Hours | Obrainsights",
+svc_page("/launch-kit/","Launch Kit: Landing Page + Waitlist in 72 Hours | Obrainsights",
  "Fixed-price launch kit for solo builders: landing page on your domain, waitlist, analytics, branding, and launch copy. $299–$999.",
  'Your idea, <span class="accent">live in 72 hours.</span>',
  "A one-page landing site on your domain with everything you need to start collecting signups and announce your launch.",
@@ -147,7 +183,7 @@ svc_page("/launch-kit/","Prompt-to-Launch Kit: Landing Page + Waitlist in 72 Hou
  "Multi-page sites, custom backends, payments beyond a hosted checkout link, and paid ads.", LK_T, LK_FAQ, "Prompt-to-Launch Kit",
  '<a class="btn" href="/contact/">Start a Launch Kit</a><a class="btn ghost" href="/pricing/">Compare tiers</a>')
 svc_page("/rescue/","Vibe-Coded App Rescue: Fix AI-Built Apps | Obrainsights",
- "Audit and fix apps built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code. $99 Health Scan, $750 Fix Sprint, $1,950 Launch-Ready.",
+ "Audit and fix apps built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code. $99 Health Scan, $149 Quick Fix, $750 Fix Sprint, $1,950 Launch-Ready.",
  'The demo works. <span class="accent">Production doesn\'t.</span> Let\'s fix that.',
  "We audit and fix AI-built apps across deploy, auth, security, bugs, and performance, and deliver every fix as a pull request you approve.",
  "Audit and fix AI-built apps in five areas: deploy/hosting, auth and roles, security (secrets, Supabase RLS/Firebase rules, input validation), bugs, and performance.",
@@ -165,15 +201,16 @@ svc_page("/agents/","Agent Setup Concierge: Done-for-You AI Agents | Obrainsight
 
 PR_FAQ = [("Why is pricing marked proposed?","These are launch prices, set at the low end of published comparable rates. They may change after the first customers; any price you are quoted in writing is the price you pay."),
  ("How do I pay?","Fixed price, paid upfront via Stripe Checkout once your written scope is agreed."),
- ("Are there any discounts?","The $99 Scan fee is credited toward a Fix tier. Launch Kit buyers get $100 off an App Rescue within 60 days. Agent setups include one free month of Care."),
+ ("Are there any discounts?","The $99 Scan fee is credited toward any Fix tier, including the $149 Quick Fix. Launch Kit buyers get $100 off an App Rescue within 60 days. Agent setups include one free month of Care. Our first 10 clients also get 30% off any package in exchange for a short testimonial; use code FOUNDING30 at checkout (30% off, first 10 customers) or mention it on your written quote."),
  ("What if I need more than my tier includes?","You get a fixed-price change order before any extra work starts. There is no hourly billing.")]
 def table(title, rows):
-    return f'<h2>{title}</h2><div class="tbl"><table><thead><tr><th>Tier</th><th>Price</th><th>Includes</th><th>Turnaround</th></tr></thead><tbody>' + "".join(f"<tr><td>{e(a)}</td><td><b>{e(b)}</b></td><td>{e(c)}</td><td>{e(d)}</td></tr>" for a,b,c,d in rows) + "</tbody></table></div>"
+    return f'<h2>{title}</h2><div class="tbl"><table><thead><tr><th>Tier</th><th>Price</th><th>Includes</th><th>Turnaround</th></tr></thead><tbody>' + "".join(f"<tr><td>{e(a)}</td><td><b>{e(b)}</b>{(' ' + buy(a, 'btn sm')) if SHOW_BUY else ''}</td><td>{e(c)}</td><td>{e(d)}</td></tr>" for a,b,c,d in rows) + "</tbody></table></div>"
 page("/pricing/","Pricing: Launch Kits, App Rescue, AI Agents | Obrainsights",
  "All Obrainsights tiers in one place: Launch Kit $299–$999, App Rescue from $99, Agent setup from $1,200, retainers from $249/mo.",
  f'''<section class="hero sm"><p class="eyebrow">Launch pricing (proposed)</p><h1>Fixed prices. <span class="accent">No hourly billing.</span></h1><p class="lead">Every tier has a written scope before you pay. All prices in USD.</p></section>
+{founding_html()}
 <section>{table('<a href="/launch-kit/">Prompt-to-Launch Kit</a>', LK_T)}{table('<a href="/rescue/">Vibe-Coded App Rescue</a>', RS_T)}{table('<a href="/agents/">Agent Setup Concierge</a>', AG_T)}{table('Agent retainers (month-to-month)', RT_T)}</section>
-<section class="card"><h2>Pricing rules</h2><ul class="checks"><li>Fixed price, paid upfront through Stripe.</li><li>The $99 Scan fee is credited toward a Fix tier.</li><li>Launch Kit buyers get $100 off a Rescue within 60 days.</li><li>Agent setups include one free month of Care.</li><li>Work beyond a tier gets a fixed-price change order.</li></ul></section>
+<section class="card"><h2>Pricing rules</h2><ul class="checks"><li>Fixed price, paid upfront through Stripe.</li><li>The $99 Scan fee is credited toward any Fix tier, including the $149 Quick Fix.</li><li>Launch Kit buyers get $100 off a Rescue within 60 days.</li><li>Agent setups include one free month of Care.</li><li>Founding customers: 30% off any package for our first 10 clients, in exchange for a short testimonial. Use code FOUNDING30 at checkout or mention it on your quote.</li><li>Work beyond a tier gets a fixed-price change order.</li></ul></section>
 {faq_html(PR_FAQ)}''', [faq_ld(PR_FAQ)])
 
 SC_FAQ = [("What does the free scan check?","A limited set of checks on a public URL or public repository, such as exposed secrets, basic security headers, and obvious deploy or config problems. The paid $99 Health Scan goes much deeper."),
@@ -202,7 +239,8 @@ page("/about/","About Obrainsights | Agent-Delivered, Human-Verified",
 page("/contact/","Contact Obrainsights",
  "Request a Launch Kit, App Rescue, or Agent Setup, or ask a question. Every request gets a written fixed-price scope.",
  f'''<section class="hero sm"><p class="eyebrow">Contact</p><h1>Tell us what you're <span class="accent">building.</span></h1><p class="lead">Pick a service and describe where you are. You'll get a written scope and fixed price before any payment.</p><p class="lead">Prefer email? Write to <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>.</p></section>
-<section class="narrow">{form("contact-form", CONTACT_ENDPOINT, [HONEYPOT, inp("name","Name"), inp("email","Email","email",ph="you@example.com"), sel("service","Interested in",["Prompt-to-Launch Kit","App Rescue: Health Scan","App Rescue: Fix Sprint / Launch-Ready","Agent Setup Concierge","Agent retainer","Something else"]), inp("link","Link to app, repo, or idea doc","url",False,"https://"), ta("message","Message",True,"What do you have, and what do you need?")], "Send")}</section>''')
+{PAID_FALLBACK}
+<section class="narrow">{form("contact-form", CONTACT_ENDPOINT, [HONEYPOT, inp("name","Name"), inp("email","Email","email",ph="you@example.com"), sel("service","Interested in",["Prompt-to-Launch Kit","App Rescue: Health Scan","App Rescue: Quick Fix ($149)","App Rescue: Fix Sprint / Launch-Ready","Agent Setup Concierge","Agent retainer","Something else"]), inp("link","Link to app, repo, or idea doc","url",False,"https://"), ta("message","Message",True,"What do you have, and what do you need?")], "Send")}</section>''')
 
 
 DRAFT = "<!-- DRAFT FOR MATT'S REVIEW: not legal advice; confirm refund terms before launch. -->"
@@ -215,7 +253,7 @@ legal_page("/terms/","Terms of Service | Obrainsights","Terms for Obrainsights s
  ("Who we are",[f'These terms are an agreement between you and {LLC}, a California limited liability company ("Obrainsights", "we"). By using obrainsights.com or buying a service, you agree to them.']),
  ("Services",["We offer fixed-scope productized services: the Prompt-to-Launch Kit, Vibe-Coded App Rescue, and Agent Setup Concierge, plus optional monthly retainers. Work is performed largely by AI agents and reviewed by a human. Each engagement is defined by a written scope agreed before payment; if the scope and these terms conflict, the written scope controls."]),
  ("Payments",["Prices are in USD and are paid upfront through Stripe. We never see or store your full card details; Stripe processes payments under its own terms and privacy policy. Retainers renew monthly until cancelled; you can cancel any time before the next billing date and keep service through the end of the paid period."]),
- ("Refunds",["If we have not started work, you can request a full refund. Once work has started, if we fail to deliver the agreed scope we will fix it or refund the undelivered portion. The $99 Health Scan is non-refundable once the report is delivered, but it is credited toward a Fix tier. Request refunds at info@obrainsights.com. [Confirm refund policy.]"]),
+ ("Refunds",["If we have not started work, you can request a full refund. Once work has started, if we fail to deliver the agreed scope we will fix it or refund the undelivered portion. The $99 Health Scan is non-refundable once the report is delivered, but it is credited toward any Fix tier, including the $149 Quick Fix. Request refunds at info@obrainsights.com. [Confirm refund policy.]"]),
  ("Your responsibilities",["You confirm you have the right to share any code, accounts, or content you give us, and you grant us the limited, revocable access needed to do the work. You pay third-party fees (hosting, domains, model and API usage) directly."]),
  ("Ownership",["When you have paid in full, you own the deliverables, code, domains, and accounts we set up for you. We may reuse general know-how and non-confidential templates."]),
  ("Free scan and newsletter",["The free app scan is provided as-is and is limited to public URLs and repositories. It is not a full security audit. The newsletter is free and you can unsubscribe at any time."]),
@@ -234,7 +272,9 @@ legal_page("/privacy/","Privacy Policy | Obrainsights","How Obrainsights collect
 ])
 
 # Blog
-from blog_posts import POSTS
+from blog_posts import POSTS as _P1
+from blog_posts_2 import POSTS2 as _P2
+POSTS = sorted(_P1 + _P2, key=lambda p: p["date"], reverse=True)  # newest first (stable within a date)
 def nice_date(d):
     import datetime; return datetime.date.fromisoformat(d).strftime("%B %-d, %Y")
 BLOG_CTA = '<section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section>'
@@ -244,7 +284,7 @@ for bp in POSTS:
            "author":{"@type":"Person","name":"Matt Keller","url":SITE+"/about/"},"publisher":{"@id":SITE+"/#org"},
            "mainEntityOfPage":{"@type":"WebPage","@id":SITE+path},"image":SITE+"/assets/og.png","inLanguage":"en"}
     crumbs = {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},{"@type":"ListItem","position":2,"name":"Blog","item":SITE+"/blog/"},{"@type":"ListItem","position":3,"name":bp["title"],"item":SITE+path}]}
-    page(path, bp["title"] + " | Obrainsights", bp["desc"],
+    page(path, bp.get("seo", bp["title"]) + " | Obrainsights", bp["desc"],
      f'''<article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · {bp["read"]}</p><h1>{bp["h1"]}</h1><p class="muted">By Matt Keller · <time datetime="{bp["date"]}">{nice_date(bp["date"])}</time></p></section>
 <section class="prose">{bp["body"]}</section></article>{BLOG_CTA}''', [art, crumbs], og_type="article")
 page("/blog/","Blog: Fixing and Launching AI-Built Apps | Obrainsights",
@@ -255,13 +295,35 @@ page("/blog/","Blog: Fixing and Launching AI-Built Apps | Obrainsights",
  [{"@type":"Blog","name":"Obrainsights Blog","url":SITE+"/blog/","publisher":{"@id":SITE+"/#org"},
    "blogPost":[{"@type":"BlogPosting","headline":bp["title"],"url":f"{SITE}/blog/{bp['slug']}/","datePublished":bp["date"]} for bp in POSTS]}])
 
+page("/thanks/","Payment received | Obrainsights","Thanks for your purchase. Here is what happens next.",
+ f'''<section class="hero sm"><p class="eyebrow">Payment confirmed</p><h1>Payment received. <span class="accent">You're in.</span></h1>
+<p class="lead" id="thanks-lead">Thanks for your purchase<span id="thanks-product"></span>. Your payment went through and your spot is reserved.</p></section>
+<section class="grid2"><div class="card"><h2>What happens next</h2><ol class="steps">
+<li><b>We'll email you within 1 business day</b> at the address you used at checkout, with a short intake and your written scope.</li>
+<li><b>We confirm the details,</b> and your turnaround clock starts once intake is complete.</li>
+<li><b>Agents do the work, a human verifies it,</b> and you get the delivery plus a plain-English handover.</li></ol></div>
+<div class="card"><h2>What to have ready</h2><ul class="checks">
+<li>A link to your app, repo, or idea doc.</li>
+<li>A short description of the issue you want fixed or the idea you want launched.</li>
+<li>Any deadlines, plus the domain you want to use if you have one.</li></ul>
+<p class="muted small">Never email passwords or API keys. We'll set up secure, revocable access with you.</p></div></section>
+<aside class="offer" id="thanks-credit" hidden><p id="thanks-credit-text"></p></aside>
+<section class="band card"><h2>Questions?</h2><p>Reply to your Stripe receipt or write to <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>. If you used code FOUNDING30, thank you for being a founding customer; we'll ask for a short testimonial after delivery.</p><a class="btn ghost" href="/">Back to home</a></section>
+<script>(function(){{var P={json.dumps(PRODUCTS)};var s=new URLSearchParams(location.search).get("paid")||"";var n=P[s];
+if(n){{document.getElementById("thanks-product").textContent=" of the "+n;document.title="Payment received: "+n+" | Obrainsights";}}
+var c="";if(s==="rs-scan")c="Your $99 Health Scan is credited toward a fix: if the report shows something you want fixed, the $99 comes off a $149 Quick Fix, Fix Sprint, or Launch-Ready.";
+else if(s==="rs-quickfix"||s==="rs-sprint"||s==="rs-launchready")c="Already bought a $99 Health Scan? Mention it when we email you and the $99 is credited toward this fix.";
+if(c){{document.getElementById("thanks-credit-text").textContent=c;document.getElementById("thanks-credit").hidden=false;}}}})();</script>''', noindex=True)
+
 # 404
-page("/404.html","Page not found | Obrainsights","This page does not exist.",
+page("/404.html","Page not found | Obrainsights","This page does not exist. Try the Obrainsights home page, pricing, or the free app scan for AI-built apps.",
  '<section class="hero sm"><h1>404: <span class="accent">nothing here.</span></h1><p class="lead">That page doesn\'t exist. Try the <a href="/">home page</a> or the <a href="/scan/">free app scan</a>.</p></section>')
 
 # sitemap / robots / llms
+LASTMOD = {f"/blog/{bp['slug']}/": bp["date"] for bp in POSTS}
+LASTMOD.update({"/": "2026-10-17", "/pricing/": "2026-10-17", "/launch-kit/": "2026-10-17", "/rescue/": "2026-10-17", "/agents/": "2026-10-17", "/blog/": max(bp["date"] for bp in POSTS)})
 paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/","/blog/"] + [f"/blog/{bp['slug']}/" for bp in POSTS]
-open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>2026-10-16</lastmod></url>\n" for p in paths) + "</urlset>\n")
+open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{LASTMOD.get(p, '2026-10-16')}</lastmod></url>\n" for p in paths) + "</urlset>\n")
 open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
 open(os.path.join(OUT,"llms.txt"),"w").write(f"""# Obrainsights
@@ -288,7 +350,7 @@ Agent Setup Concierge:
 Retainers (month-to-month; customer pays model/API usage directly):
 {lt(RT_T)}
 
-Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; work beyond a tier gets a fixed-price change order, never hourly billing.
+Rules: the $99 Scan fee is credited toward any Fix tier, including the $149 Quick Fix; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; founding customer offer: 30% off any package for the first 10 clients in exchange for a short testimonial, using code FOUNDING30 at checkout or mentioning it on the written quote; work beyond a tier gets a fixed-price change order, never hourly billing.
 
 ## Policies
 - Customers own all accounts, domains, and code.

@@ -12,6 +12,7 @@ while todo:
         for m in re.findall(r'<script type="application/ld\+json">(.*?)</script>', body, re.S): json.loads(m)
         for h in re.findall(r'(?:href|src)="([^"]+)"', body):
             u = urllib.parse.urlparse(h)
+            if u.scheme in ("mailto","tel"): continue
             if u.scheme in ("http","https") and not h.startswith("https://obrainsights.com"): continue
             path = u.path if u.scheme else urllib.parse.urljoin(p, h).split("#")[0]
             if path: todo.append(path)

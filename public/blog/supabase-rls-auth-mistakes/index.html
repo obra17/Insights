@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supabase RLS and Auth Mistakes in AI-Built Apps | Obrainsights</title><meta name="description" content="Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each."><link rel="canonical" href="https://obrainsights.com/blog/supabase-rls-auth-mistakes/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="Supabase RLS and Auth Mistakes in AI-Built Apps | Obrainsights">
+<meta property="og:description" content="Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each."><meta property="og:url" content="https://obrainsights.com/blog/supabase-rls-auth-mistakes/"><meta property="og:image" content="https://obrainsights.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Supabase RLS and Auth Mistakes in AI-Built Apps | Obrainsights"><meta name="twitter:description" content="Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each."><meta name="twitter:image" content="https://obrainsights.com/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://obrainsights.com/#org", "name": "Obrainsights", "url": "https://obrainsights.com/", "logo": "https://obrainsights.com/assets/logo.svg", "email": "info@obrainsights.com", "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "info@obrainsights.com"}, "founder": {"@type": "Person", "name": "Matt Keller"}, "description": "Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}, {"@type": "Article", "headline": "Supabase RLS and Auth Mistakes in AI-Built Apps (and How to Fix Them)", "description": "Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each.", "datePublished": "2026-10-17", "dateModified": "2026-10-17", "author": {"@type": "Person", "name": "Matt Keller", "url": "https://obrainsights.com/about/"}, "publisher": {"@id": "https://obrainsights.com/#org"}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://obrainsights.com/blog/supabase-rls-auth-mistakes/"}, "image": "https://obrainsights.com/assets/og.png", "inLanguage": "en"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://obrainsights.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://obrainsights.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "Supabase RLS and Auth Mistakes in AI-Built Apps (and How to Fix Them)", "item": "https://obrainsights.com/blog/supabase-rls-auth-mistakes/"}]}]}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav><a href="/launch-kit/">Launch Kit</a><a href="/rescue/">App Rescue</a><a href="/agents/">Agent Setup</a><a href="/pricing/">Pricing</a><a href="/blog/" aria-current=page>Blog</a><a href="/about/">About</a><a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap"><article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · 8 min read</p><h1>Supabase RLS mistakes <span class="accent">your AI assistant made.</span></h1><p class="muted">By Matt Keller · <time datetime="2026-10-17">October 17, 2026</time></p></section>
+<section class="prose">
+<p>Supabase is the default backend for a huge share of vibe-coded apps. It's a great choice, but it comes with one rule that AI assistants routinely get wrong: <b>your anon key is public, so Row Level Security is the only thing standing between strangers and your data.</b></p>
+<p>Anyone who opens your site can find the project URL and anon key in the JavaScript bundle. That's by design. It's only safe if every table has RLS turned on with the right policies. Here are the mistakes we see most often in AI-built apps, and how to fix them.</p>
+
+<h2>1. RLS is turned off on a table</h2>
+<p>Tables created through the SQL editor or a migration don't get RLS automatically, and assistants often generate <code>create table</code> statements without enabling it. Open the Supabase dashboard, go to Advisors, then Security Advisor, and look for "RLS disabled in public." Fix each table:</p>
+<pre><code>alter table public.projects enable row level security;</code></pre>
+<p>Enabling RLS with no policies blocks all access through the API, so your app will "break" right away. That's expected. Add the policies below next.</p>
+
+<h2>Heads up: new tables need explicit grants from October 30, 2026</h2>
+<p>Supabase is changing a default. Starting <b>October 30, 2026</b>, new tables you create in the <code>public</code> schema on existing projects are no longer exposed to the Data API (the REST and GraphQL layer <code>supabase-js</code> uses) until you grant access. Projects created since late May 2026 already work this way. Existing tables keep their grants. A new table without a grant returns <code>42501 permission denied for table ...</code>, even with correct policies. (<a href="https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically" rel="noopener">Supabase changelog</a>)</p>
+<p>The danger is the "fix" your assistant reaches for: turning off RLS or granting everything to <code>anon</code>. Instead, have every migration that creates a table do three things together: grant only the roles and operations the app uses, enable RLS, and add owner policies.</p>
+<pre><code>grant select, insert, update, delete on public.projects to authenticated;
+alter table public.projects enable row level security;
+-- then the owner policies below</code></pre>
+<p>Only grant to <code>anon</code> if logged-out visitors genuinely need that table.</p>
+
+<h2>2. The "fix" was <code>using (true)</code></h2>
+<p>When the app breaks after RLS is enabled, the quickest prompt answer is a policy like <code>using (true)</code>. That makes the table readable by everyone again. Write policies that tie each row to its owner instead:</p>
+<pre><code>create policy "Owners read their projects" on public.projects
+  for select to authenticated
+  using ((select auth.uid()) = user_id);
+
+create policy "Owners insert their projects" on public.projects
+  for insert to authenticated
+  with check ((select auth.uid()) = user_id);</code></pre>
+<p>Add matching <code>update</code> and <code>delete</code> policies. Wrapping <code>auth.uid()</code> in <code>select</code> lets Postgres evaluate it once per query instead of once per row, and an index on <code>user_id</code> keeps these queries fast as the table grows.</p>
+
+<h2>3. Update policies without <code>with check</code></h2>
+<p>An update policy with only <code>using</code> controls which rows a user can change, but not what they change them to. Without <code>with check</code>, a user can update their own row and set <code>user_id</code> to someone else's ID, or flip a <code>plan</code> column to "pro." Give update policies both clauses, and keep sensitive columns like plan, credits, and role out of tables users can write to.</p>
+
+<h2>4. Roles stored where users can edit them</h2>
+<p>A common AI-generated pattern is checking <code>user.user_metadata.role === "admin"</code>. User metadata can be changed by the signed-in user. Store roles in <code>app_metadata</code> (only server code with the service role can set it) or in a separate <code>user_roles</code> table that users can read but not write. Then check the role in your RLS policies or server code, not just by hiding buttons in the UI.</p>
+
+<h2>5. The service_role key in the frontend</h2>
+<p>The <code>service_role</code> key bypasses RLS entirely. If an assistant "fixed" a permissions error by swapping it in, every visitor now has admin access to your database. Search your built files and your repo for it. If you find it in client code, move that operation into a server function or Edge Function, then rotate the key in the dashboard. Deleting it from the code isn't enough; assume it has already been copied. Our guide to <a href="/blog/api-keys-leaking-ai-apps/">leaked API keys in AI-built apps</a> covers how to look.</p>
+
+<h2>6. Views and functions that skip RLS</h2>
+<p>Two quieter holes:</p>
+<ul>
+<li><b>Views</b> run with the permissions of whoever created them by default, which usually means RLS doesn't apply. On Postgres 15 and later, create views with <code>with (security_invoker = true)</code> so the caller's policies are enforced.</li>
+<li><b>Functions marked <code>security definer</code></b> run as their owner and can be called through the API with <code>rpc()</code>. Only use them when you have to, check <code>auth.uid()</code> inside them, and set a fixed <code>search_path</code>.</li>
+</ul>
+
+<h2>7. Storage buckets left public</h2>
+<p>Uploaded files live in Supabase Storage, which has its own policies on <code>storage.objects</code>. A public bucket means anyone with the URL can download the file. For invoices, ID photos, or anything private, use a private bucket, store files under a folder named after the user's ID, and add policies that check that folder against <code>auth.uid()</code>. Serve files with signed URLs that expire.</p>
+
+<h2>8. Trusting the session on the server</h2>
+<p>In server code (API routes, server components, middleware), <code>getSession()</code> reads whatever is in the cookie without re-verifying it. To decide whether a request is allowed, verify the user with <code>getUser()</code> (or verified JWT claims) before you trust the user ID. This matters most anywhere you use the service role key, because RLS won't catch the mistake for you.</p>
+
+<h2>Two tests that take five minutes</h2>
+<p><b>The anon test.</b> Copy your project URL and anon key from the browser, then request a table directly, as a logged-out stranger would:</p>
+<pre><code>curl "https://YOUR-PROJECT.supabase.co/rest/v1/projects?select=*" \
+  -H "apikey: YOUR_ANON_KEY"</code></pre>
+<p>You should get an empty list or an error, never real rows.</p>
+<p><b>The two-user test.</b> Sign up as User A and create something. In a private window, sign up as User B and try to read or edit A's item, through the UI or by replaying A's request with B's token. If B can see A's data, fix that before you launch. More on this in <a href="/blog/fix-broken-vibe-coded-app/">how to fix a broken vibe-coded app</a>.</p>
+
+<h2>Get a second opinion</h2>
+<p>RLS problems are invisible until someone goes looking, and the people who go looking aren't always friendly. Our <a href="/scan/">free app scan</a> checks a public URL for exposed keys and obvious misconfigurations. The <a href="/rescue/">$99 Health Scan</a> reviews your policies table by table, and a <a href="/rescue/">$149 Quick Fix</a> covers a single issue like one leaky table, delivered as a pull request you approve.</p>
+</section></article><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>

@@ -4,6 +4,7 @@ POSTS = [
 {
 "slug": "ai-app-wont-deploy",
 "title": "Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work",
+"seo": "AI-Built App Won't Deploy? 9 Fixes That Work",
 "h1": 'Your AI-built app won\'t deploy. <span class="accent">Here\'s what to check.</span>',
 "desc": "Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.",
 "date": "2026-10-16",
@@ -57,12 +58,13 @@ POSTS = [
 
 <h2>When to stop prompting</h2>
 <p>If your assistant has "fixed" the same deploy error three times and it's still failing, stop. Every extra prompt adds changes you'll have to untangle later. Revert to the last commit that built cleanly, then work through the checklist above one item at a time.</p>
-<p>And if you'd rather have someone look at it with fresh eyes, that's exactly what we do.</p>
+<p>And if you'd rather have someone look at it with fresh eyes, that's exactly what we do. If you already know the one thing that's broken, a <a href="/rescue/">$149 Quick Fix</a> covers a single deploy issue, delivered as a pull request.</p>
 """,
 },
 {
 "slug": "fix-broken-vibe-coded-app",
 "title": "How to Fix a Broken Vibe-Coded App (Without Making It Worse)",
+"seo": "How to Fix a Broken Vibe-Coded App Safely",
 "h1": 'How to fix a broken vibe-coded app <span class="accent">without making it worse.</span>',
 "desc": "Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.",
 "date": "2026-10-16",
@@ -113,12 +115,13 @@ POSTS = [
 
 <h2>When it's time to get help</h2>
 <p>Bring in a second pair of eyes if you've spent more than a day on the same bug, if the problem involves other people's data or money, or if every fix creates a new problem. Sometimes the honest answer is that a section needs rebuilding, and it's better to know that early.</p>
-<p>Our Health Scan does the steps above for you: a severity-ranked report with evidence, and fixes delivered as pull requests you approve. Start with the free scan to see what turns up.</p>
+<p>Our <a href="/rescue/">Health Scan</a> does the steps above for you: a severity-ranked report with evidence, and fixes delivered as pull requests you approve. Start with the <a href="/scan/">free scan</a> to see what turns up.</p>
 """,
 },
 {
 "slug": "launch-ai-app-from-prompt",
 "title": "How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend",
+"seo": "Launch an AI App From a Prompt in a Weekend",
 "h1": 'From prompt to <span class="accent">live URL in a weekend.</span>',
 "desc": "A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.",
 "date": "2026-10-16",
@@ -175,7 +178,7 @@ POSTS = [
 
 <h2>What usually goes wrong</h2>
 <p>When launches slip, it's rarely the idea. It's the plumbing: DNS, auth redirects, environment variables, webhooks, or an AI assistant stuck in a loop on the last bug. If that's where you are, you're closer than it feels.</p>
-<p>That last stretch is what we do. Our Prompt-to-Launch Kit gets a landing page, waitlist, and launch copy live on your domain in 72 hours, and our App Rescue fixes AI-built apps that won't make it to production. Not sure which you need? Start with the free scan.</p>
+<p>That last stretch is what we do. Our <a href="/launch-kit/">Prompt-to-Launch Kit</a> gets a landing page, waitlist, and launch copy live on your domain in 72 hours, and our <a href="/rescue/">App Rescue</a> fixes AI-built apps that won't make it to production. Not sure which you need? Start with the <a href="/scan/">free scan</a>.</p>
 """,
 },
 ]

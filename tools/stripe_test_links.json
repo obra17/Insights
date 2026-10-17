@@ -1,0 +1,15 @@
+{
+ "Starter": "https://buy.stripe.com/test_8x29AT8xt3126rn5etenS00",
+ "Standard": "https://buy.stripe.com/test_cNi28r7tpbxycPLeP3enS01",
+ "Plus": "https://buy.stripe.com/test_9B628r4hd312dTPbCRenS02",
+ "Health Scan": "https://buy.stripe.com/test_fZudR93d90SUaHDcGVenS03",
+ "Quick Fix": "https://buy.stripe.com/test_7sY9AT151fNO8zvfT7enS04",
+ "Fix Sprint": "https://buy.stripe.com/test_3cI7sLcNJdFG4jfayNenS05",
+ "Launch-Ready": "https://buy.stripe.com/test_cNi3cv4hd9pqg1XgXbenS06",
+ "Single Agent": "https://buy.stripe.com/test_5kQ3cv9BxfNOcPL4apenS07",
+ "Agent Pack": "https://buy.stripe.com/test_bJe28raFBeJK6rn9uJenS08",
+ "Care": "https://buy.stripe.com/test_8x2eVdaFBdFGcPL22henS09",
+ "Ops": "https://buy.stripe.com/test_eVq28r6pl0SUaHD5etenS0a",
+ "Pro": "https://buy.stripe.com/test_14AbJ1aFBeJK02Z36lenS0b",
+ "_after_completion_redirect": "https://obrainsights.com/thanks/?paid=<slug>"
+}

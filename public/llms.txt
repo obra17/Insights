@@ -17,6 +17,7 @@ Prompt-to-Launch Kit:
 
 Vibe-Coded App Rescue:
 - Health Scan: $99. Automated + agent-reviewed audit, severity-ranked report. Credited toward a fix.. Turnaround: 48 hours.
+- Quick Fix: $149. One specific bug or deploy issue fixed, delivered as a PR with a short handover note. Turnaround: 48 hours.
 - Fix Sprint: $750. Up to 5 critical/high issues fixed, PRs + handover, 7-day support. Turnaround: 5 business days.
 - Launch-Ready: $1,950. Up to 12 issues + production deploy, auth/payments verified, 14-day support. Turnaround: 10 business days.
 
@@ -29,7 +30,7 @@ Retainers (month-to-month; customer pays model/API usage directly):
 - Ops: $599/mo (up to 3 agents). Care + 1 improvement/month + 48-hour response. Turnaround: Ongoing.
 - Pro: $1,200/mo (up to 6 agents). Ops + 3 improvements/month + priority response. Turnaround: Ongoing.
 
-Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; work beyond a tier gets a fixed-price change order, never hourly billing.
+Rules: the $99 Scan fee is credited toward any Fix tier, including the $149 Quick Fix; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; founding customer offer: 30% off any package for the first 10 clients in exchange for a short testimonial, using code FOUNDING30 at checkout or mentioning it on the written quote; work beyond a tier gets a fixed-price change order, never hourly billing.
 
 ## Policies
 - Customers own all accounts, domains, and code.
@@ -38,6 +39,9 @@ Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $10
 - Full rebuilds and migrations are out of scope for App Rescue.
 
 ## Guides
+- [Supabase RLS and Auth Mistakes in AI-Built Apps (and How to Fix Them)](https://obrainsights.com/blog/supabase-rls-auth-mistakes/): Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each.
+- [Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them](https://obrainsights.com/blog/api-keys-leaking-ai-apps/): How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed.
+- [How to Set Up Your First AI Agent for a Small Business (Without the Hype)](https://obrainsights.com/blog/first-ai-agent-small-business/): A practical, step-by-step guide to setting up a first AI agent for a small business: picking the right job, permissions, testing, human approval, and running costs.
 - [Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work](https://obrainsights.com/blog/ai-app-wont-deploy/): Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.
 - [How to Fix a Broken Vibe-Coded App (Without Making It Worse)](https://obrainsights.com/blog/fix-broken-vibe-coded-app/): Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.
 - [How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend](https://obrainsights.com/blog/launch-ai-app-from-prompt/): A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.

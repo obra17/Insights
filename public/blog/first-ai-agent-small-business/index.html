@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Set Up Your First AI Agent for a Small Business | Obrainsights</title><meta name="description" content="A practical, step-by-step guide to setting up a first AI agent for a small business: picking the right job, permissions, testing, human approval, and running costs."><link rel="canonical" href="https://obrainsights.com/blog/first-ai-agent-small-business/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="How to Set Up Your First AI Agent for a Small Business | Obrainsights">
+<meta property="og:description" content="A practical, step-by-step guide to setting up a first AI agent for a small business: picking the right job, permissions, testing, human approval, and running costs."><meta property="og:url" content="https://obrainsights.com/blog/first-ai-agent-small-business/"><meta property="og:image" content="https://obrainsights.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="How to Set Up Your First AI Agent for a Small Business | Obrainsights"><meta name="twitter:description" content="A practical, step-by-step guide to setting up a first AI agent for a small business: picking the right job, permissions, testing, human approval, and running costs."><meta name="twitter:image" content="https://obrainsights.com/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://obrainsights.com/#org", "name": "Obrainsights", "url": "https://obrainsights.com/", "logo": "https://obrainsights.com/assets/logo.svg", "email": "info@obrainsights.com", "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "info@obrainsights.com"}, "founder": {"@type": "Person", "name": "Matt Keller"}, "description": "Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}, {"@type": "Article", "headline": "How to Set Up Your First AI Agent for a Small Business (Without the Hype)", "description": "A practical, step-by-step guide to setting up a first AI agent for a small business: picking the right job, permissions, testing, human approval, and running costs.", "datePublished": "2026-10-17", "dateModified": "2026-10-17", "author": {"@type": "Person", "name": "Matt Keller", "url": "https://obrainsights.com/about/"}, "publisher": {"@id": "https://obrainsights.com/#org"}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://obrainsights.com/blog/first-ai-agent-small-business/"}, "image": "https://obrainsights.com/assets/og.png", "inLanguage": "en"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://obrainsights.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://obrainsights.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "How to Set Up Your First AI Agent for a Small Business (Without the Hype)", "item": "https://obrainsights.com/blog/first-ai-agent-small-business/"}]}]}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav><a href="/launch-kit/">Launch Kit</a><a href="/rescue/">App Rescue</a><a href="/agents/">Agent Setup</a><a href="/pricing/">Pricing</a><a href="/blog/" aria-current=page>Blog</a><a href="/about/">About</a><a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap"><article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · 8 min read</p><h1>Your first AI agent: <span class="accent">one job, done well.</span></h1><p class="muted">By Matt Keller · <time datetime="2026-10-17">October 17, 2026</time></p></section>
+<section class="prose">
+<p>Most small businesses don't need an "autonomous AI workforce." They need one tedious job taken off someone's plate, done reliably, without the agent emailing a customer something strange at 2 a.m. That's a very achievable goal. Here's how to get there.</p>
+
+<h2>1. Pick one job, not a department</h2>
+<p>The best first agent handles work that is:</p>
+<ul>
+<li><b>Repetitive:</b> it happens daily or weekly, in roughly the same shape.</li>
+<li><b>Text-heavy:</b> reading, sorting, summarizing, or drafting.</li>
+<li><b>Low-risk if it's wrong:</b> a person reviews the output before it matters.</li>
+<li><b>Easy to check:</b> you can tell in seconds whether the result is good.</li>
+</ul>
+<p>Good first jobs include triaging an inbox and drafting replies, researching leads and drafting first-touch messages, turning one video or podcast into posts and a newsletter, and summarizing support tickets into a weekly report. Bad first jobs include anything that moves money, signs contracts, or talks to customers without review.</p>
+
+<h2>2. Write the job down like you'd train a new hire</h2>
+<p>Before touching any tool, write a one-page brief:</p>
+<ul>
+<li><b>Trigger:</b> what starts the work (a new email, a new row in a sheet, 8 a.m. every weekday).</li>
+<li><b>Inputs:</b> what the agent can see.</li>
+<li><b>Steps:</b> how a good employee does it today, including the judgment calls.</li>
+<li><b>Output:</b> exactly what "done" looks like, and where it goes (a draft, a label, a row, a Slack message to you).</li>
+<li><b>Never:</b> the things it must not do.</li>
+</ul>
+<p>If you can't write this page, the agent won't be able to follow it either. This document becomes the agent's instructions.</p>
+
+<h2>3. Choose the simplest tool that works</h2>
+<p>You don't need to write code for a first agent. Roughly in order of effort:</p>
+<ul>
+<li><b>Built-in assistants</b> in tools you already use (your email, CRM, or helpdesk) for simple summarize-and-draft jobs.</li>
+<li><b>Automation platforms</b> like Zapier, Make, or n8n, which connect a trigger, an AI step, and an action with no code.</li>
+<li><b>Agent frameworks or custom code</b> when the job needs several tools, memory, or branching logic.</li>
+</ul>
+<p>Whatever you choose, run it on <b>accounts your business owns</b>, with the model API billed to you. You want to keep the agent if you part ways with whoever built it.</p>
+
+<h2>4. Give it the least access it needs</h2>
+<p>This is where most of the risk lives. Give the agent read access and the ability to create <em>drafts</em>, labels, or notes, not to send, delete, or pay. Use a dedicated account or API key for the agent so you can see what it did and revoke access in one click. Add the "send" permission later, one category at a time, once you trust it.</p>
+
+<h2>5. Keep a human approval step</h2>
+<p>For anything customer-facing, the agent drafts and a person approves. In practice that's a draft sitting in your email, a message in Slack with Approve and Edit buttons, or a row in a sheet waiting for a checkmark. It sounds slow, but reviewing a good draft takes seconds, and the time saved is still most of the job.</p>
+
+<h2>6. Test with real examples before going live</h2>
+<p>Collect 20 to 30 real past examples (emails, leads, transcripts) including a few awkward ones. Run the agent on all of them and grade each result: right, fixable, or wrong. Change the instructions and run them again until the "wrong" pile is basically empty. Keep this set. Every time you change a prompt, or the model provider updates its model, rerun it.</p>
+
+<h2>7. Run it in shadow mode for a week</h2>
+<p>Let the agent work on live inputs while you keep doing the job as usual, and compare. You'll find the cases your test set missed. When the agent matches your judgment most of the time and the misses are harmless, switch to approval mode for real.</p>
+
+<h2>8. Watch cost, errors, and drift</h2>
+<ul>
+<li><b>Cost:</b> set a monthly spend limit on the model API. For a low-volume job, usage is often modest, but a loop or a flood of inputs can surprise you.</li>
+<li><b>Errors:</b> make failures loud. A silent agent that stopped working a week ago is worse than no agent.</li>
+<li><b>Drift:</b> models, APIs, and your business change. Review a sample of the agent's work every week or two, and keep a short runbook so someone else can fix it.</li>
+</ul>
+
+<h2>A realistic first month</h2>
+<p>Week one: pick the job and write the brief. Week two: build it and test on past examples. Week three: shadow mode. Week four: approval mode, with a weekly review. By the end of the month you should know whether it saves real time, and which job to automate next.</p>
+
+<h2>Want it done for you?</h2>
+<p>Our <a href="/agents/">Agent Setup Concierge</a> builds single-job agents (Inbox Triage, Content Repurposing, and Lead Research) on accounts you own, with human approval for anything that sends a message or spends money, a runbook, and monitoring. A <a href="/agents/">Single Agent setup is $1,200</a> and includes a free first month of Care. See <a href="/pricing/">all pricing</a>.</p>
+</section></article><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>
