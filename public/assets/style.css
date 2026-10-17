@@ -21,7 +21,7 @@ h2{font-size:30px;letter-spacing:-.03em;margin:0 0 16px}h3{margin:0 0 8px;letter
 .btn{display:inline-block;background:var(--p);color:var(--ptx)!important;padding:12px 20px;border-radius:var(--r);text-decoration:none;border:1px solid var(--p);cursor:pointer;font:700 16px var(--sans)}
 .btn:hover{filter:brightness(.92)}.btn.sm{padding:7px 14px;font-size:14px}
 .btn.ghost{background:transparent;color:var(--tx)!important;border:1px solid rgba(20,17,16,.2)}.btn.ghost:hover{background:var(--sec);filter:none}
-main section{margin:56px 0}
+main section{margin:56px 0}main section.hero{margin-top:0}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px}
 .grid3{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
