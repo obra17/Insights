@@ -1,6 +1,6 @@
 # Obrainsights
 
-> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. Founder: Matt Keller. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
+> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
 
 ## Services
 - [Prompt-to-Launch Kit](https://obrainsights.com/launch-kit/): one-page landing site on the customer's domain, waitlist, analytics, basic branding, launch copy.

@@ -29,7 +29,6 @@ CONTACT_ENDPOINT = "/api/contact"  # Cloudflare Pages Function -> Resend -> info
 
 NAV = [("/launch-kit/","Launch Kit"),("/rescue/","App Rescue"),("/agents/","Agent Setup"),("/pricing/","Pricing"),("/blog/","Blog"),("/about/","About")]
 ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/brand/obra-mark.png","email":"info@obrainsights.com","contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"info@obrainsights.com"},
-       "founder":{"@type":"Person","name":"Matt Keller"},
        "description":"Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}
 
 def e(s): return html.escape(s, quote=True)
@@ -112,7 +111,7 @@ AG_FAQ = [("What agents do you set up?","The starting catalog is Inbox Triage, C
  ("Can an agent send messages or spend money for me?","Only with a human-approval step that you control."),
  ("What does the retainer cover?","Monitoring, fixes when models or APIs change, prompt and eval tuning, and a set number of improvements each month, depending on tier. Retainers are month-to-month.")]
 GEN_FAQ = [("What is Obrainsights?","A productized services business for solo builders that turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it."),
- ("Who does the work?","AI agents handle intake, scoping, delivery, QA, and follow-up. A human (founder Matt Keller) approves pricing exceptions, credentials, payments, and final sign-off."),
+ ("Who does the work?","AI agents handle intake, scoping, delivery, QA, and follow-up. A human on our team approves pricing exceptions, credentials, payments, and final sign-off."),
  ("Are prices fixed?","Yes. Every tier has a fixed price and written scope, paid upfront. Work beyond a tier gets a fixed-price change order, never hourly billing."),
  ("Who owns the code and accounts?","You do. Customers own all accounts, domains, and code.")]
 
@@ -232,7 +231,7 @@ page("/newsletter/","Newsletter for AI Builders and Vibe Coders | Obrainsights",
 <section class="narrow"><div class="card beehiiv-embed"><script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="118a4bdf-32cb-4e2b-8382-c0beb710ea12"></script><noscript><p>Subscribe at <a href="https://obrainsights.beehiiv.com/subscribe">obrainsights.beehiiv.com/subscribe</a>.</p></noscript></div><p class="muted small">Prefer a direct link? <a href="https://obrainsights.beehiiv.com/subscribe">Subscribe on Beehiiv</a>.</p></section>''')
 
 page("/about/","About Obrainsights | Agent-Delivered, Human-Verified",
- "Obrainsights is an AI-agent-run productized services business founded by Matt Keller, with human checkpoints for credentials, payments, and sign-off.",
+ "Obrainsights is an AI-agent-run productized services business, with human checkpoints for credentials, payments, and sign-off.",
  f'''<section class="hero sm"><p class="eyebrow">About</p><h1>An agent-run business, <span class="accent">with a human in the loop.</span></h1></section>
 <section class="prose"><p>Obra Insights helps businesses and builders use AI as a tool to save time, resources, and effort. Human-led AI implementation for the real world: we take an idea, a prompt, or a half-broken AI-built app to a live, working product, then set up the AI agents that help run it.</p>
 <p>The business is operated by AI agents that handle intake, scoping, delivery, QA, and follow-up. Our team brings the human touch into the loop. They approve custom quotes, refunds, access to production credentials, anything touching payments or personal data, and anything published under our name.</p>
@@ -246,7 +245,7 @@ page("/contact/","Contact Obrainsights",
 <section class="narrow">{form("contact-form", CONTACT_ENDPOINT, [HONEYPOT, inp("name","Name"), inp("email","Email","email",ph="you@example.com"), sel("service","Interested in",["Prompt-to-Launch Kit","App Rescue: Health Scan","App Rescue: Quick Fix ($149)","App Rescue: Fix Sprint / Launch-Ready","Agent Setup Concierge","Agent retainer","Something else"]), inp("link","Link to app, repo, or idea doc","url",False,"https://"), ta("message","Message",True,"What do you have, and what do you need?")], "Send")}</section>''')
 
 
-DRAFT = "<!-- DRAFT FOR MATT'S REVIEW: not legal advice; confirm refund terms before launch. -->"
+DRAFT = "<!-- DRAFT FOR OWNER REVIEW: not legal advice; confirm refund terms before launch. -->"
 UPD = "October 16, 2026"
 def legal_page(path, title, desc, h1, sections):
     body = f'<section class="hero sm"><p class="eyebrow">Legal (draft)</p><h1>{h1}</h1><p class="muted">Last updated: {UPD}. Draft pending review.</p></section><section class="prose">' + "".join(f"<h2>{e(h)}</h2>" + "".join(f"<p>{x}</p>" for x in ps) for h,ps in sections) + '<p>Questions: <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>.</p></section>'
@@ -284,11 +283,11 @@ BLOG_CTA = '<section class="band card"><h2>Want a second pair of eyes on your ap
 for bp in POSTS:
     path = f"/blog/{bp['slug']}/"
     art = {"@type":"Article","headline":bp["title"],"description":bp["desc"],"datePublished":bp["date"],"dateModified":bp["date"],
-           "author":{"@type":"Person","name":"Matt Keller","url":SITE+"/about/"},"publisher":{"@id":SITE+"/#org"},
+           "author":{"@type":"Organization","name":"Obra Insights team","url":SITE+"/about/"},"publisher":{"@id":SITE+"/#org"},
            "mainEntityOfPage":{"@type":"WebPage","@id":SITE+path},"image":SITE+"/assets/og.png","inLanguage":"en"}
     crumbs = {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},{"@type":"ListItem","position":2,"name":"Blog","item":SITE+"/blog/"},{"@type":"ListItem","position":3,"name":bp["title"],"item":SITE+path}]}
     page(path, bp.get("seo", bp["title"]) + " | Obrainsights", bp["desc"],
-     f'''<article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · {bp["read"]}</p><h1>{bp["h1"]}</h1><p class="muted">By Matt Keller · <time datetime="{bp["date"]}">{nice_date(bp["date"])}</time></p></section>
+     f'''<article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · {bp["read"]}</p><h1>{bp["h1"]}</h1><p class="muted">By the Obra Insights team · <time datetime="{bp["date"]}">{nice_date(bp["date"])}</time></p></section>
 <section class="prose">{bp["body"]}</section></article>{BLOG_CTA}''', [art, crumbs], og_type="article")
 page("/blog/","Blog: Fixing and Launching AI-Built Apps | Obrainsights",
  "Practical guides for vibe coders: fixing broken Lovable, Bolt, Cursor, and Replit apps, getting them deployed, and launching them.",
@@ -331,7 +330,7 @@ open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSite
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
 open(os.path.join(OUT,"llms.txt"),"w").write(f"""# Obrainsights
 
-> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. Founder: Matt Keller. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
+> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
 
 ## Services
 - [Prompt-to-Launch Kit]({SITE}/launch-kit/): one-page landing site on the customer's domain, waitlist, analytics, basic branding, launch copy.
