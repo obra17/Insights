@@ -37,9 +37,15 @@ Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $10
 - Every change goes through a pull request the customer approves.
 - Full rebuilds and migrations are out of scope for App Rescue.
 
+## Guides
+- [Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work](https://obrainsights.com/blog/ai-app-wont-deploy/): Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.
+- [How to Fix a Broken Vibe-Coded App (Without Making It Worse)](https://obrainsights.com/blog/fix-broken-vibe-coded-app/): Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.
+- [How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend](https://obrainsights.com/blog/launch-ai-app-from-prompt/): A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.
+
 ## Optional
 - [About](https://obrainsights.com/about/)
 - [Contact](https://obrainsights.com/contact/): email info@obrainsights.com
 - [Newsletter](https://obrainsights.com/newsletter/)
+- [Blog](https://obrainsights.com/blog/)
 - [Terms](https://obrainsights.com/terms/)
 - [Privacy](https://obrainsights.com/privacy/)

@@ -50,3 +50,5 @@ th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-
 /* Beehiiv embed */
 .beehiiv-embed{background:#fbf8f3;padding:1.25rem;min-height:120px;display:flex;justify-content:center}
 .beehiiv-embed iframe{max-width:100%;border:0;border-radius:.75rem}
+.prose code{font-family:"JetBrains Mono",monospace;font-size:.88em;background:var(--sec);padding:1px 5px;border-radius:4px;word-break:break-word}
+.prose li{margin:6px 0}.prose h2{margin-top:36px}

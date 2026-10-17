@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend | Obrainsights</title><meta name="description" content="A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it."><link rel="canonical" href="https://obrainsights.com/blog/launch-ai-app-from-prompt/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend | Obrainsights">
+<meta property="og:description" content="A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it."><meta property="og:url" content="https://obrainsights.com/blog/launch-ai-app-from-prompt/"><meta property="og:image" content="https://obrainsights.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend | Obrainsights"><meta name="twitter:description" content="A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it."><meta name="twitter:image" content="https://obrainsights.com/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://obrainsights.com/#org", "name": "Obrainsights", "url": "https://obrainsights.com/", "logo": "https://obrainsights.com/assets/logo.svg", "email": "info@obrainsights.com", "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "info@obrainsights.com"}, "founder": {"@type": "Person", "name": "Matt Keller"}, "description": "Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}, {"@type": "Article", "headline": "How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend", "description": "A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.", "datePublished": "2026-10-16", "dateModified": "2026-10-16", "author": {"@type": "Person", "name": "Matt Keller", "url": "https://obrainsights.com/about/"}, "publisher": {"@id": "https://obrainsights.com/#org"}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://obrainsights.com/blog/launch-ai-app-from-prompt/"}, "image": "https://obrainsights.com/assets/og.png", "inLanguage": "en"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://obrainsights.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://obrainsights.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend", "item": "https://obrainsights.com/blog/launch-ai-app-from-prompt/"}]}]}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav><a href="/launch-kit/">Launch Kit</a><a href="/rescue/">App Rescue</a><a href="/agents/">Agent Setup</a><a href="/pricing/">Pricing</a><a href="/blog/" aria-current=page>Blog</a><a href="/about/">About</a><a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap"><article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · 8 min read</p><h1>From prompt to <span class="accent">live URL in a weekend.</span></h1><p class="muted">By Matt Keller · <time datetime="2026-10-16">October 16, 2026</time></p></section>
+<section class="prose">
+<p>AI tools have made building the first version of an app almost free. Launching it is a different story. Most vibe-coded projects stall in the gap between "it works on my screen" and "strangers are using it." This guide closes that gap with a plan you can finish in a weekend.</p>
+
+<h2>Friday night: shrink the idea</h2>
+<p>The fastest way to never launch is to start with ten features. Write one sentence: <em>"[Who] can [do one thing] so they [get one result]."</em> For example: "Wedding photographers can turn a client questionnaire into a shot list in one click."</p>
+<p>Then list what's needed to deliver that sentence and nothing else. Usually that's a landing page, a sign-up, the one core action, and a way to pay or join a waitlist. Settings pages, dark mode, and team accounts can wait for version two.</p>
+
+<h2>Friday night: pick your tool and stack</h2>
+<p>Choose based on where you are, not what's trending:</p>
+<ul>
+<li><b>No code experience:</b> Lovable, Bolt, or v0 for the UI, with Supabase for login and data.</li>
+<li><b>Some code experience:</b> Cursor or Claude Code on a standard stack (Next.js or Vite with Supabase) so you can take the code anywhere.</li>
+<li><b>Just validating demand:</b> skip the app. A landing page and waitlist will tell you more in a week.</li>
+</ul>
+<p>Whatever you pick, connect a GitHub repo from day one. You want to own your code, not rent it from the tool.</p>
+
+<h2>Saturday morning: write the prompt like a spec</h2>
+<p>A good first prompt reads like a one-page brief: who the user is, the one core flow step by step, what data you store, and what the user sees when something goes wrong. Ask the tool to build the core flow first, with fake data, before adding login or payments.</p>
+<p>Build in small steps and commit after each one that works. "Add the shot list page" is a good prompt. "Build the whole app" is how you end up with a codebase nobody understands.</p>
+
+<h2>Saturday afternoon: add login and data safely</h2>
+<p>Add authentication once the core flow works. If you're on Supabase, do two things right away:</p>
+<ul>
+<li>Turn on Row Level Security for every table and add policies so users can only read and write their own rows.</li>
+<li>Run the two-user test: sign up as two different users and confirm neither can see the other's data.</li>
+</ul>
+<p>Keep secret keys on the server. Anything in a <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable is public.</p>
+
+<h2>Saturday evening: deploy early</h2>
+<p>Deploy the moment you have a working core flow, even if it's ugly. Deploying on Sunday night is when people discover missing environment variables, broken auth redirects, and 404s on refresh. Our <a href="/blog/ai-app-wont-deploy/">deploy troubleshooting guide</a> covers the usual problems.</p>
+<p>Then connect your domain. Buy it from any registrar, point it at your host following the host's instructions, and make sure HTTPS works on both the bare domain and <code>www</code>. Update your auth provider's redirect URLs to the new domain.</p>
+
+<h2>Sunday morning: payments or a waitlist</h2>
+<p>If you're charging from day one, the simplest path is a hosted checkout: Stripe Payment Links or Stripe Checkout. You don't handle card details, and you can test everything in Stripe's test mode with test cards before going live. If your app unlocks features after payment, grant access from a verified webhook, not from the thank-you page.</p>
+<p>Not ready to charge? Put up a waitlist with a clear promise ("Early access in November, founding price locked in") and collect emails with a newsletter tool.</p>
+
+<h2>Sunday afternoon: the launch checklist</h2>
+<p>Before you tell anyone, run through this list:</p>
+<ul>
+<li>Sign up, log in, log out, and reset a password on your phone and your laptop.</li>
+<li>Complete the core action and a test payment end to end.</li>
+<li>Check that your page titles, descriptions, and social preview image look right when you paste the link into a message.</li>
+<li>Add basic analytics so you can see where people drop off.</li>
+<li>Add a contact email and short Terms and Privacy pages.</li>
+<li>Submit your sitemap to Google Search Console.</li>
+</ul>
+
+<h2>Sunday evening: announce it</h2>
+<p>Write one short post that explains the problem, shows the product in a screenshot or 30-second clip, and gives one link. Share it where your users already are: X, a relevant subreddit, a Discord, or a Product Hunt launch later in the week. Reply to every comment. Your first ten users will tell you what version two should be.</p>
+
+<h2>What usually goes wrong</h2>
+<p>When launches slip, it's rarely the idea. It's the plumbing: DNS, auth redirects, environment variables, webhooks, or an AI assistant stuck in a loop on the last bug. If that's where you are, you're closer than it feels.</p>
+<p>That last stretch is what we do. Our Prompt-to-Launch Kit gets a landing page, waitlist, and launch copy live on your domain in 72 hours, and our App Rescue fixes AI-built apps that won't make it to production. Not sure which you need? Start with the free scan.</p>
+</section></article><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>

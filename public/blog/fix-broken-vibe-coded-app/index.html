@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Fix a Broken Vibe-Coded App (Without Making It Worse) | Obrainsights</title><meta name="description" content="Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely."><link rel="canonical" href="https://obrainsights.com/blog/fix-broken-vibe-coded-app/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="How to Fix a Broken Vibe-Coded App (Without Making It Worse) | Obrainsights">
+<meta property="og:description" content="Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely."><meta property="og:url" content="https://obrainsights.com/blog/fix-broken-vibe-coded-app/"><meta property="og:image" content="https://obrainsights.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="How to Fix a Broken Vibe-Coded App (Without Making It Worse) | Obrainsights"><meta name="twitter:description" content="Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely."><meta name="twitter:image" content="https://obrainsights.com/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://obrainsights.com/#org", "name": "Obrainsights", "url": "https://obrainsights.com/", "logo": "https://obrainsights.com/assets/logo.svg", "email": "info@obrainsights.com", "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "info@obrainsights.com"}, "founder": {"@type": "Person", "name": "Matt Keller"}, "description": "Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}, {"@type": "Article", "headline": "How to Fix a Broken Vibe-Coded App (Without Making It Worse)", "description": "Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.", "datePublished": "2026-10-16", "dateModified": "2026-10-16", "author": {"@type": "Person", "name": "Matt Keller", "url": "https://obrainsights.com/about/"}, "publisher": {"@id": "https://obrainsights.com/#org"}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://obrainsights.com/blog/fix-broken-vibe-coded-app/"}, "image": "https://obrainsights.com/assets/og.png", "inLanguage": "en"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://obrainsights.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://obrainsights.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "How to Fix a Broken Vibe-Coded App (Without Making It Worse)", "item": "https://obrainsights.com/blog/fix-broken-vibe-coded-app/"}]}]}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav><a href="/launch-kit/">Launch Kit</a><a href="/rescue/">App Rescue</a><a href="/agents/">Agent Setup</a><a href="/pricing/">Pricing</a><a href="/blog/" aria-current=page>Blog</a><a href="/about/">About</a><a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap"><article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · 7 min read</p><h1>How to fix a broken vibe-coded app <span class="accent">without making it worse.</span></h1><p class="muted">By Matt Keller · <time datetime="2026-10-16">October 16, 2026</time></p></section>
+<section class="prose">
+<p>Every vibe coder knows this loop. Something breaks. You ask the AI to fix it. It fixes that and breaks two other things. You ask again. An hour later the app is worse than when you started, and you're not sure which of the last twenty changes caused it.</p>
+<p>The way out isn't a better prompt. It's a better process. Here's the one we use on rescue jobs, adapted so you can do it yourself.</p>
+
+<h2>Step 1: Freeze and save a checkpoint</h2>
+<p>Stop prompting. Commit everything as it is right now, broken or not, with a message like <code>checkpoint before fix</code>. If your project isn't in Git yet, connect it to GitHub today. Lovable, Bolt, and Replit can all sync to a repo.</p>
+<p>One caution: if your tool syncs both ways with GitHub, decide which side is the source of truth before you edit anywhere else. Editing the repo by hand while the AI tool keeps its own copy is how people lose a week of work.</p>
+<p>Then find the last version that worked. Most tools keep a version history; Git has <code>git log</code>. Knowing the last good point turns "everything is broken" into "something changed between Tuesday and today."</p>
+
+<h2>Step 2: Write down exactly what's broken</h2>
+<p>Vague problems get vague fixes. For each issue, write three lines:</p>
+<ul>
+<li><b>What I did:</b> "Logged in as a new user and clicked Save on the profile page."</li>
+<li><b>What I expected:</b> "Profile saves and shows a success message."</li>
+<li><b>What happened:</b> "Spinner forever. Console shows 403 on <code>/rest/v1/profiles</code>."</li>
+</ul>
+<p>That last line matters. Open the browser console and the network tab, reproduce the bug, and copy the first error. Ninety percent of the diagnosis is in that one message.</p>
+
+<h2>Step 3: Rank the problems, then fix one at a time</h2>
+<p>Sort your list by severity. Our order is: security issues first (anyone can read other users' data, keys exposed), then anything that blocks signup, login, or payment, then broken features, then cosmetic issues.</p>
+<p>Then give the AI exactly one problem per conversation. A good fix prompt looks like this:</p>
+<p><code>Bug: [the three lines from step 2]. Error: [the first console error]. Relevant file: [path]. Before changing code, list the 3 most likely root causes and tell me how to confirm each one. Change only what's needed for the confirmed cause.</code></p>
+<p>Asking for causes before code stops the assistant from rewriting half your app on a guess.</p>
+
+<h2>Step 4: The two-strike rule</h2>
+<p>If a fix doesn't work, revert it before trying the next idea. If two fixes in a row fail, stop and add logging instead of more changes: print the values going in and out of the function that's failing. Stacking failed fixes on top of each other is the single biggest reason vibe-coded apps spiral.</p>
+
+<h2>Step 5: Check the usual suspects</h2>
+<p>Most broken AI-built apps we look at have at least one of these:</p>
+<ul>
+<li><b>Row Level Security off or too open.</b> In Supabase, every table that holds user data needs RLS enabled and policies that limit rows to their owner. A policy of <code>USING (true)</code> means anyone can read everything.</li>
+<li><b>Roles checked in the browser.</b> Hiding the admin button isn't security. Check roles on the server or in the database policy, not in <code>user_metadata</code> the user can edit.</li>
+<li><b>Secrets in the frontend.</b> Search your built JavaScript for <code>sk_live</code>, <code>service_role</code>, or <code>sk-</code>. If they're there, move those calls to a server function and rotate the keys.</li>
+<li><b>Missing environment variables</b> in production (see our <a href="/blog/ai-app-wont-deploy/">deploy checklist</a>).</li>
+<li><b>Webhooks that trust the success URL</b> instead of a verified Stripe event.</li>
+</ul>
+
+<h2>Step 6: The two-user test</h2>
+<p>This takes sixty seconds and catches the most dangerous bug in vibe-coded apps. Sign up as User A and create something. Open a private window, sign up as User B, and try to view or edit User A's item, either through the UI or by replaying A's network request. If B can see A's data, fix that before anything else.</p>
+
+<h2>Step 7: Verify, then lock it in</h2>
+<p>After each fix, reproduce the original steps and confirm the bug is gone. Then click through signup, login, the main feature, and payment to make sure nothing else broke. Commit with a clear message (<code>fix: profile save 403, add owner RLS policy</code>). Small, labeled commits make the next bug much easier to find.</p>
+<p>If you can, turn the bug into a quick test or a line in a checklist so the next "quick fix" from your assistant doesn't quietly reopen it.</p>
+
+<h2>When it's time to get help</h2>
+<p>Bring in a second pair of eyes if you've spent more than a day on the same bug, if the problem involves other people's data or money, or if every fix creates a new problem. Sometimes the honest answer is that a section needs rebuilding, and it's better to know that early.</p>
+<p>Our Health Scan does the steps above for you: a severity-ranked report with evidence, and fixes delivered as pull requests you approve. Start with the free scan to see what turns up.</p>
+</section></article><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>

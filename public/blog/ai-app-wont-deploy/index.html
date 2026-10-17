@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lovable, Bolt, or Cursor App Won&#x27;t Deploy? 9 Fixes That Actually Work | Obrainsights</title><meta name="description" content="Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won&#x27;t deploy, and how to fix each one."><link rel="canonical" href="https://obrainsights.com/blog/ai-app-wont-deploy/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="Lovable, Bolt, or Cursor App Won&#x27;t Deploy? 9 Fixes That Actually Work | Obrainsights">
+<meta property="og:description" content="Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won&#x27;t deploy, and how to fix each one."><meta property="og:url" content="https://obrainsights.com/blog/ai-app-wont-deploy/"><meta property="og:image" content="https://obrainsights.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Lovable, Bolt, or Cursor App Won&#x27;t Deploy? 9 Fixes That Actually Work | Obrainsights"><meta name="twitter:description" content="Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won&#x27;t deploy, and how to fix each one."><meta name="twitter:image" content="https://obrainsights.com/assets/og.png">
+<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://obrainsights.com/#org", "name": "Obrainsights", "url": "https://obrainsights.com/", "logo": "https://obrainsights.com/assets/logo.svg", "email": "info@obrainsights.com", "contactPoint": {"@type": "ContactPoint", "contactType": "customer support", "email": "info@obrainsights.com"}, "founder": {"@type": "Person", "name": "Matt Keller"}, "description": "Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}, {"@type": "Article", "headline": "Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work", "description": "Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.", "datePublished": "2026-10-16", "dateModified": "2026-10-16", "author": {"@type": "Person", "name": "Matt Keller", "url": "https://obrainsights.com/about/"}, "publisher": {"@id": "https://obrainsights.com/#org"}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://obrainsights.com/blog/ai-app-wont-deploy/"}, "image": "https://obrainsights.com/assets/og.png", "inLanguage": "en"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://obrainsights.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://obrainsights.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work", "item": "https://obrainsights.com/blog/ai-app-wont-deploy/"}]}]}</script>
+</head><body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav><a href="/launch-kit/">Launch Kit</a><a href="/rescue/">App Rescue</a><a href="/agents/">Agent Setup</a><a href="/pricing/">Pricing</a><a href="/blog/" aria-current=page>Blog</a><a href="/about/">About</a><a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<main class="wrap"><article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · 7 min read</p><h1>Your AI-built app won't deploy. <span class="accent">Here's what to check.</span></h1><p class="muted">By Matt Keller · <time datetime="2026-10-16">October 16, 2026</time></p></section>
+<section class="prose">
+<p>You built something in Lovable, Bolt, Cursor, Replit, or v0. It works in the preview. Then you hit deploy and get a build error, a blank white screen, or a site that loads but can't log anyone in.</p>
+<p>The good news: the code is rarely the problem. Most failed deploys of vibe-coded apps come down to a handful of configuration issues the AI tool hid from you while you were inside its sandbox. Here are the nine we see most often, in the order you should check them.</p>
+
+<h2>1. Read the actual build log first</h2>
+<p>Before changing anything, open the build or deploy log on your host (Vercel, Netlify, Cloudflare Pages, Render, or the AI tool's own publish screen) and scroll to the <em>first</em> red line. Not the last one. The last error is usually a side effect. The first one tells you what broke.</p>
+<p>Copy that line, and only that line, into your AI assistant along with the file it points to. Pasting the whole log invites the assistant to "fix" five unrelated things at once.</p>
+
+<h2>2. Environment variables are missing in production</h2>
+<p>This is the number one cause. Your <code>.env</code> file lives on your machine or inside the AI tool. Your host has never seen it. Add every variable in your host's dashboard (Settings, then Environment Variables) and redeploy.</p>
+<p>Two details catch people out:</p>
+<ul>
+<li><b>Client-side prefixes.</b> Vite apps (most Lovable and Bolt exports) only expose variables that start with <code>VITE_</code>. Next.js apps need <code>NEXT_PUBLIC_</code>. Without the prefix, the value is <code>undefined</code> in the browser.</li>
+<li><b>Build time, not run time.</b> Vite and Next.js bake public variables into the bundle when the app builds. If you add a variable after deploying, you must rebuild, not just restart.</li>
+</ul>
+<p>And never put a secret key (Stripe secret, Supabase <code>service_role</code>, OpenAI key) in a <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable. Anything with those prefixes is readable by anyone who opens your site.</p>
+
+<h2>3. Blank white screen after deploy</h2>
+<p>A white screen almost always means JavaScript crashed before it could render. Open the browser console (right-click, Inspect, Console). You'll typically see one of these:</p>
+<ul>
+<li><code>Failed to load module script</code> or 404s on <code>/assets/*.js</code>: your host is serving from the wrong folder. Set the output directory to <code>dist</code> (Vite) or leave the Next.js default.</li>
+<li><code>supabaseUrl is required</code> or similar: a missing environment variable (see #2).</li>
+<li>A wrong <code>base</code> path in <code>vite.config</code> if you deploy to a subfolder.</li>
+</ul>
+
+<h2>4. Refreshing any page gives a 404</h2>
+<p>Single-page apps handle routing in the browser. When you refresh <code>/dashboard</code>, the host looks for a real file called <code>dashboard</code>, doesn't find one, and returns 404. Add a rewrite so every unknown path serves <code>index.html</code>:</p>
+<ul>
+<li><b>Netlify / Cloudflare Pages:</b> a <code>_redirects</code> file in your public folder containing <code>/* /index.html 200</code>.</li>
+<li><b>Vercel:</b> a <code>rewrites</code> rule in <code>vercel.json</code> that sends <code>/(.*)</code> to <code>/index.html</code>.</li>
+</ul>
+
+<h2>5. Login works in preview but breaks in production</h2>
+<p>If you use Supabase Auth, go to Authentication, then URL Configuration. Set the Site URL to your live domain and add <code>https://yourdomain.com/**</code> to the Redirect URLs. If you use Google or GitHub sign-in, add the live domain to that provider's OAuth client too. Localhost and the preview URL don't cover production. This is behind most "login loop" and "redirects back to localhost" reports.</p>
+
+<h2>6. The build fails on type or lint errors</h2>
+<p>Preview environments are often forgiving. Production builds aren't. <code>next build</code> runs a type check, and a single <code>any</code> mismatch the AI introduced three prompts ago can block the whole deploy. Run <code>npm run build</code> locally to see the same errors. Fix the types rather than switching off checking; the errors usually point at a real bug.</p>
+
+<h2>7. Wrong Node version or a messy lockfile</h2>
+<p>If the log mentions an unsupported engine, a syntax error inside <code>node_modules</code>, or <code>npm ci</code> failing, pin the Node version your app was built with (an <code>.nvmrc</code> file or the host's Node setting) and make sure exactly one lockfile is committed. Having both <code>package-lock.json</code> and <code>bun.lockb</code> or <code>pnpm-lock.yaml</code> confuses most hosts.</p>
+
+<h2>8. File names that differ only by case</h2>
+<p>macOS and Windows don't care whether you import <code>./components/Header</code> or <code>./components/header</code>. Linux build servers do. If the log says a module can't be found but you can see the file, check the capitalization.</p>
+
+<h2>9. Payments and webhooks don't fire</h2>
+<p>Stripe checkout opens, the customer pays, and nothing happens in your app. Check that the webhook endpoint is registered for the right mode (test and live are separate), that you're using that endpoint's own signing secret, and that your handler verifies the signature against the raw request body. Grant access from the verified webhook, never from the success-page URL, or anyone can unlock your product by visiting that page.</p>
+
+<h2>When to stop prompting</h2>
+<p>If your assistant has "fixed" the same deploy error three times and it's still failing, stop. Every extra prompt adds changes you'll have to untangle later. Revert to the last commit that built cleanly, then work through the checklist above one item at a time.</p>
+<p>And if you'd rather have someone look at it with fresh eyes, that's exactly what we do.</p>
+</section></article><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
+<footer class="foot"><div class="wrap cols">
+<div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
+<div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
+</div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
+<script src="/assets/forms.js" defer></script></body></html>

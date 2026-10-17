@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generates the static site into public/. No dependencies. Run: python3 tools/build.py"""
-import json, os, html
+import json, os, html, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://obrainsights.com"
 OUT = os.path.join(os.path.dirname(__file__), "..", "public")
 # TODO(endpoints): set these to real form endpoints (e.g. Formspree, Tally, Netlify Forms, Cloudflare Worker).
@@ -9,7 +10,7 @@ SCAN_ENDPOINT = "/api/scan"        # Cloudflare Pages Function -> Resend -> info
 # Newsletter: Beehiiv embed on /newsletter/ (https://obrainsights.beehiiv.com)
 CONTACT_ENDPOINT = "/api/contact"  # Cloudflare Pages Function -> Resend -> info@
 
-NAV = [("/launch-kit/","Launch Kit"),("/rescue/","App Rescue"),("/agents/","Agent Setup"),("/pricing/","Pricing"),("/about/","About")]
+NAV = [("/launch-kit/","Launch Kit"),("/rescue/","App Rescue"),("/agents/","Agent Setup"),("/pricing/","Pricing"),("/blog/","Blog"),("/about/","About")]
 ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/logo.svg","email":"info@obrainsights.com","contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"info@obrainsights.com"},
        "founder":{"@type":"Person","name":"Matt Keller"},
        "description":"Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}
@@ -44,14 +45,14 @@ def sel(name, label, opts):
     return f'<label>{e(label)}<select name="{name}">' + "".join(f"<option>{e(o)}</option>" for o in opts) + '</select></label>'
 HONEYPOT = '<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">'
 
-def page(path, title, desc, body, ld=None, pre=""):
+def page(path, title, desc, body, ld=None, pre="", og_type="website"):
     url = SITE + path
     graph = [ORG] + (ld or [])
-    nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path else ""}>{t}</a>' for h,t in NAV)
+    nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path or (h=="/blog/" and path.startswith("/blog/")) else ""}>{t}</a>' for h,t in NAV)
     doc = f'''<!doctype html>
 {pre}<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">{"" if path.endswith(".html") else f'<link rel="canonical" href="{url}">'}
-<meta property="og:type" content="website"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
+<meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
 <meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
@@ -62,7 +63,7 @@ def page(path, title, desc, body, ld=None, pre=""):
 <footer class="foot"><div class="wrap cols">
 <div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
 <div><p><b>Services</b></p><a href="/launch-kit/">Prompt-to-Launch Kit</a><a href="/rescue/">Vibe-Coded App Rescue</a><a href="/agents/">Agent Setup Concierge</a><a href="/pricing/">Pricing</a></div>
-<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
+<div><p><b>Company</b></p><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/blog/">Blog</a><a href="/newsletter/">Newsletter</a><a href="/scan/">Free App Scan</a><a href="/llms.txt">llms.txt</a><a href="mailto:info@obrainsights.com">info@obrainsights.com</a></div>
 <div><p><b>Legal</b></p><a href="/terms/">Terms of Service</a><a href="/privacy/">Privacy Policy</a></div>
 </div><p class="wrap muted small">© 2026 Obrainsights. All prices in USD.</p></footer>
 <script src="/assets/forms.js" defer></script></body></html>'''
@@ -204,14 +205,14 @@ page("/contact/","Contact Obrainsights",
 <section class="narrow">{form("contact-form", CONTACT_ENDPOINT, [HONEYPOT, inp("name","Name"), inp("email","Email","email",ph="you@example.com"), sel("service","Interested in",["Prompt-to-Launch Kit","App Rescue: Health Scan","App Rescue: Fix Sprint / Launch-Ready","Agent Setup Concierge","Agent retainer","Something else"]), inp("link","Link to app, repo, or idea doc","url",False,"https://"), ta("message","Message",True,"What do you have, and what do you need?")], "Send")}</section>''')
 
 
-DRAFT = "<!-- DRAFT FOR MATT'S REVIEW: not legal advice; replace [LLC name], [state], and confirm refund terms before launch. -->"
+DRAFT = "<!-- DRAFT FOR MATT'S REVIEW: not legal advice; confirm refund terms before launch. -->"
 UPD = "October 16, 2026"
 def legal_page(path, title, desc, h1, sections):
     body = f'<section class="hero sm"><p class="eyebrow">Legal (draft)</p><h1>{h1}</h1><p class="muted">Last updated: {UPD}. Draft pending review.</p></section><section class="prose">' + "".join(f"<h2>{e(h)}</h2>" + "".join(f"<p>{x}</p>" for x in ps) for h,ps in sections) + '<p>Questions: <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>.</p></section>'
     page(path, title, desc, body, pre=DRAFT+"\n")
-LLC = "Obrainsights [LLC name]"
+LLC = "Obrainsights, operated by Obra Ventures LLC"
 legal_page("/terms/","Terms of Service | Obrainsights","Terms for Obrainsights services: Launch Kits, App Rescue, and Agent Setup.","Terms of <span class=\"accent\">Service</span>",[
- ("Who we are",[f'These terms are an agreement between you and {LLC}, a [state] limited liability company ("Obrainsights", "we"). By using obrainsights.com or buying a service, you agree to them.']),
+ ("Who we are",[f'These terms are an agreement between you and {LLC}, a California limited liability company ("Obrainsights", "we"). By using obrainsights.com or buying a service, you agree to them.']),
  ("Services",["We offer fixed-scope productized services: the Prompt-to-Launch Kit, Vibe-Coded App Rescue, and Agent Setup Concierge, plus optional monthly retainers. Work is performed largely by AI agents and reviewed by a human. Each engagement is defined by a written scope agreed before payment; if the scope and these terms conflict, the written scope controls."]),
  ("Payments",["Prices are in USD and are paid upfront through Stripe. We never see or store your full card details; Stripe processes payments under its own terms and privacy policy. Retainers renew monthly until cancelled; you can cancel any time before the next billing date and keep service through the end of the paid period."]),
  ("Refunds",["If we have not started work, you can request a full refund. Once work has started, if we fail to deliver the agreed scope we will fix it or refund the undelivered portion. The $99 Health Scan is non-refundable once the report is delivered, but it is credited toward a Fix tier. Request refunds at info@obrainsights.com. [Confirm refund policy.]"]),
@@ -219,10 +220,10 @@ legal_page("/terms/","Terms of Service | Obrainsights","Terms for Obrainsights s
  ("Ownership",["When you have paid in full, you own the deliverables, code, domains, and accounts we set up for you. We may reuse general know-how and non-confidential templates."]),
  ("Free scan and newsletter",["The free app scan is provided as-is and is limited to public URLs and repositories. It is not a full security audit. The newsletter is free and you can unsubscribe at any time."]),
  ("Disclaimers and liability",["Services are provided with reasonable skill, but we do not guarantee your app will be free of bugs or security issues. To the extent the law allows, our total liability for any claim is limited to the amount you paid us for the service in question, and we are not liable for indirect or consequential losses."]),
- ("Changes and governing law",["We may update these terms; the version in effect when you buy applies to that purchase. These terms are governed by the laws of [state], USA."]),
+ ("Changes and governing law",["We may update these terms; the version in effect when you buy applies to that purchase. These terms are governed by the laws of the State of California, USA."]),
 ])
 legal_page("/privacy/","Privacy Policy | Obrainsights","How Obrainsights collects and uses data from forms, the newsletter, payments, and hosting.","Privacy <span class=\"accent\">Policy</span>",[
- ("Who we are",[f"{LLC} operates obrainsights.com. Contact us at info@obrainsights.com about anything in this policy."]),
+ ("Who we are",[f"obrainsights.com is run by {LLC}, a California limited liability company. Contact us at info@obrainsights.com about anything in this policy."]),
  ("What we collect",["Contact and scan forms: your name, email, links you submit, and your message. Newsletter: your email and basic engagement data. Purchases: billing details handled by Stripe. Hosting: standard technical logs such as IP address and browser type."]),
  ("Service providers",['Form submissions are delivered to our inbox by email through <a href="https://resend.com/legal/privacy-policy">Resend</a>. The newsletter runs on <a href="https://www.beehiiv.com/privacy">Beehiiv</a>. Payments are processed by <a href="https://stripe.com/privacy">Stripe</a>; we never receive your full card number. The site is hosted on <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a> Pages. Our email runs on Google Workspace. Each provider handles data under its own privacy policy.']),
  ("How we use it",["To reply to you, deliver and scope services, send the newsletter you signed up for, process payments, and keep the site secure. We do not sell your personal information."]),
@@ -232,12 +233,34 @@ legal_page("/privacy/","Privacy Policy | Obrainsights","How Obrainsights collect
  ("Changes",["We will post updates here and change the date at the top."]),
 ])
 
+# Blog
+from blog_posts import POSTS
+def nice_date(d):
+    import datetime; return datetime.date.fromisoformat(d).strftime("%B %-d, %Y")
+BLOG_CTA = '<section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section>'
+for bp in POSTS:
+    path = f"/blog/{bp['slug']}/"
+    art = {"@type":"Article","headline":bp["title"],"description":bp["desc"],"datePublished":bp["date"],"dateModified":bp["date"],
+           "author":{"@type":"Person","name":"Matt Keller","url":SITE+"/about/"},"publisher":{"@id":SITE+"/#org"},
+           "mainEntityOfPage":{"@type":"WebPage","@id":SITE+path},"image":SITE+"/assets/og.png","inLanguage":"en"}
+    crumbs = {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},{"@type":"ListItem","position":2,"name":"Blog","item":SITE+"/blog/"},{"@type":"ListItem","position":3,"name":bp["title"],"item":SITE+path}]}
+    page(path, bp["title"] + " | Obrainsights", bp["desc"],
+     f'''<article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · {bp["read"]}</p><h1>{bp["h1"]}</h1><p class="muted">By Matt Keller · <time datetime="{bp["date"]}">{nice_date(bp["date"])}</time></p></section>
+<section class="prose">{bp["body"]}</section></article>{BLOG_CTA}''', [art, crumbs], og_type="article")
+page("/blog/","Blog: Fixing and Launching AI-Built Apps | Obrainsights",
+ "Practical guides for vibe coders: fixing broken Lovable, Bolt, Cursor, and Replit apps, getting them deployed, and launching them.",
+ '<section class="hero sm"><p class="eyebrow">Blog</p><h1>Ship it, <span class="accent">fix it, launch it.</span></h1><p class="lead">Practical guides for getting AI-built apps from prompt to production.</p></section><section class="grid3">'
+ + "".join(f'<a class="card svc" href="/blog/{bp["slug"]}/"><span class="tag">{bp["read"]}</span><h3>{e(bp["title"])}</h3><p>{e(bp["desc"])}</p></a>' for bp in POSTS)
+ + '</section>' + BLOG_CTA,
+ [{"@type":"Blog","name":"Obrainsights Blog","url":SITE+"/blog/","publisher":{"@id":SITE+"/#org"},
+   "blogPost":[{"@type":"BlogPosting","headline":bp["title"],"url":f"{SITE}/blog/{bp['slug']}/","datePublished":bp["date"]} for bp in POSTS]}])
+
 # 404
 page("/404.html","Page not found | Obrainsights","This page does not exist.",
  '<section class="hero sm"><h1>404: <span class="accent">nothing here.</span></h1><p class="lead">That page doesn\'t exist. Try the <a href="/">home page</a> or the <a href="/scan/">free app scan</a>.</p></section>')
 
 # sitemap / robots / llms
-paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/"]
+paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/","/blog/"] + [f"/blog/{bp['slug']}/" for bp in POSTS]
 open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>2026-10-16</lastmod></url>\n" for p in paths) + "</urlset>\n")
 open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
@@ -273,10 +296,14 @@ Rules: the $99 Scan fee is credited toward a Fix tier; Launch Kit buyers get $10
 - Every change goes through a pull request the customer approves.
 - Full rebuilds and migrations are out of scope for App Rescue.
 
+## Guides
+{chr(10).join(f"- [{bp['title']}]({SITE}/blog/{bp['slug']}/): {bp['desc']}" for bp in POSTS)}
+
 ## Optional
 - [About]({SITE}/about/)
 - [Contact]({SITE}/contact/): email info@obrainsights.com
 - [Newsletter]({SITE}/newsletter/)
+- [Blog]({SITE}/blog/)
 - [Terms]({SITE}/terms/)
 - [Privacy]({SITE}/privacy/)
 """)
