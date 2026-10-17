@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Generates the static site into public/. No dependencies. Run: python3 tools/build.py"""
+import hashlib as _hl
 import json, os, html, sys, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://obrainsights.com"
 OUT = os.environ.get("OBRA_OUT") or os.path.join(os.path.dirname(__file__), "..", "public")
+_CSS_SRC = os.path.join(os.path.dirname(__file__), "..", "public", "assets", "style.css")
+CSS_VER = _hl.md5(open(_CSS_SRC,"rb").read()).hexdigest()[:8] if os.path.exists(_CSS_SRC) else "1"
 # Buy buttons (Stripe Payment Links) are OFF by default. Production builds never set SHOW_BUY.
 # Preview only: SHOW_BUY=1 OBRA_OUT=/tmp/obra-preview python3 tools/build.py
 # Live (after Stripe activation): SHOW_BUY=1 STRIPE_LIVE=1 python3 tools/build.py  -> uses tools/stripe_live_links.json,
@@ -76,7 +79,7 @@ def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=Fa
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
-{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" href="/assets/brand/obra-favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" href="/assets/brand/obra-favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css?v={CSS_VER}">
 <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":graph})}</script>
 </head><body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/"><img class="mark" src="/assets/brand/obra-mark-160.png" alt="Obra logo" width="40" height="40"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
