@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generates the static site into public/. No dependencies. Run: python3 tools/build.py"""
-import json, os, html, sys
+import json, os, html, sys, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://obrainsights.com"
 OUT = os.environ.get("OBRA_OUT") or os.path.join(os.path.dirname(__file__), "..", "public")
@@ -25,7 +25,7 @@ SCAN_ENDPOINT = "/api/scan"        # Cloudflare Pages Function -> Resend -> info
 CONTACT_ENDPOINT = "/api/contact"  # Cloudflare Pages Function -> Resend -> info@
 
 NAV = [("/launch-kit/","Launch Kit"),("/rescue/","App Rescue"),("/agents/","Agent Setup"),("/pricing/","Pricing"),("/blog/","Blog"),("/about/","About")]
-ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/logo.svg","email":"info@obrainsights.com","contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"info@obrainsights.com"},
+ORG = {"@type":"Organization","@id":SITE+"/#org","name":"Obrainsights","url":SITE+"/","logo":SITE+"/assets/brand/obra-mark.png","email":"info@obrainsights.com","contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"info@obrainsights.com"},
        "founder":{"@type":"Person","name":"Matt Keller"},
        "description":"Productized services that take an idea, prompt, or half-broken vibe-coded app to a live, working product, delivered by AI agents and verified by a human."}
 
@@ -76,10 +76,10 @@ def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=Fa
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Obrainsights"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
-{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/assets/logo.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
+{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" href="/assets/brand/obra-favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css">
 <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":graph})}</script>
 </head><body>
-<header class="top"><div class="wrap nav"><a class="brand" href="/"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><img class="mark" src="/assets/brand/obra-mark-160.png" alt="Obra logo" width="40" height="40"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
 <main class="wrap">{'<p class="offer"><b>Preview with Stripe TEST checkout.</b> Buy buttons use Stripe test mode. Use card 4242 4242 4242 4242; no real charges.</p>' if TEST_PREVIEW else ''}{body}</main>
 <footer class="foot"><div class="wrap cols">
 <div><p class="brand"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified. Founded by Matt Keller.</p></div>
@@ -369,4 +369,10 @@ Rules: the $99 Scan fee is credited toward any Fix tier, including the $149 Quic
 - [Terms]({SITE}/terms/)
 - [Privacy]({SITE}/privacy/)
 """)
+# Static files: site/static/ is the source for brand assets + favicon.ico; copied into OUT on every build.
+_here = os.path.dirname(os.path.abspath(__file__)); _pub = os.path.abspath(os.path.join(_here, "..", "public"))
+if os.path.abspath(OUT) != _pub:  # preview/other outputs: bring along the hand-maintained files in public/
+    shutil.copytree(os.path.join(_pub, "assets"), os.path.join(OUT, "assets"), dirs_exist_ok=True)
+    shutil.copy2(os.path.join(_pub, "_headers"), os.path.join(OUT, "_headers"))
+shutil.copytree(os.path.join(_here, "..", "static"), OUT, dirs_exist_ok=True)
 print("built", len(paths)+1, "pages")
