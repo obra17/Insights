@@ -152,9 +152,9 @@ var b=document.getElementById("paid-fallback");b.hidden=false;document.getElemen
 # Home
 page("/", "Obrainsights: From Prompt to Live, Working Product",
  "Fixed-price launch kits, vibe-coded app rescue, and done-for-you AI agents for solo builders. Agent-delivered, human-verified.",
- f'''<section class="hero"><p class="eyebrow">For vibe coders, indie hackers, creators, and game devs</p>
+ f'''<section class="hero"><p class="eyebrow">Human-led AI implementation for the real world</p>
 <h1>From prompt to <span class="accent">live, working product.</span></h1>
-<p class="lead">Obrainsights turns an idea, a prompt, or a half-broken AI-built app into something real people can use, then sets up the AI agents that help you run it.</p>
+<p class="lead">At Obra Insights, we help businesses use AI as a practical tool to save time, cut wasted effort, and get real results, from a working app to AI agents that handle the busywork.</p>
 <div class="cta"><a class="btn" href="/scan/">Get a free app scan</a><a class="btn ghost" href="/pricing/">See pricing</a></div></section>
 {founding_html()}
 <section><h2>Three services, one path</h2><div class="grid3">
@@ -234,7 +234,7 @@ page("/newsletter/","Newsletter for AI Builders and Vibe Coders | Obrainsights",
 page("/about/","About Obrainsights | Agent-Delivered, Human-Verified",
  "Obrainsights is an AI-agent-run productized services business founded by Matt Keller, with human checkpoints for credentials, payments, and sign-off.",
  f'''<section class="hero sm"><p class="eyebrow">About</p><h1>An agent-run business, <span class="accent">with a human in the loop.</span></h1></section>
-<section class="prose"><p>Obrainsights is a productized services business for solo builders: vibe coders, indie hackers, creators, streamers, and indie game devs. We take an idea, a prompt, or a half-broken AI-built app to a live, working product, then set up the AI agents that help run it.</p>
+<section class="prose"><p>Obra Insights helps businesses and builders use AI as a tool to save time, resources, and effort. Human-led AI implementation for the real world: we take an idea, a prompt, or a half-broken AI-built app to a live, working product, then set up the AI agents that help run it.</p>
 <p>The business is operated by AI agents that handle intake, scoping, delivery, QA, and follow-up. <b>Matt Keller</b> is the founder and the human in the loop. He approves custom quotes, refunds, access to production credentials, anything touching payments or personal data, and anything published under his name.</p>
 <h2>How we work</h2><ul class="checks"><li>Fixed scopes and fixed prices, written before you pay.</li><li>Least-privilege, revocable access; credentials kept in a vault, never in chat or a repo.</li><li>Every change goes through a pull request you approve.</li><li>You own all accounts, domains, and code.</li><li>We're open about the agent model and show where humans check the work.</li></ul>
 <p>This site was built with our own Launch Kit process.</p></section>''')
