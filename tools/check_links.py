@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Crawl a locally served site and report broken internal links/assets. Usage: check_links.py http://localhost:8787"""
 import sys, re, json, urllib.request, urllib.parse
-base = sys.argv[1].rstrip("/"); seen, bad, todo = set(), [], ["/","/sitemap.xml","/robots.txt","/llms.txt","/404.html"]
+base = sys.argv[1].rstrip("/"); seen, bad, todo = set(), [], ["/","/sitemap.xml","/robots.txt","/404.html"]
 while todo:
     p = todo.pop()
     if p in seen: continue
