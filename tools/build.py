@@ -321,56 +321,13 @@ if(c){{document.getElementById("thanks-credit-text").textContent=c;document.getE
 page("/404.html","Page not found | Obrainsights","This page does not exist. Try the Obrainsights home page, pricing, or the free app scan for AI-built apps.",
  '<section class="hero sm"><h1>404: <span class="accent">nothing here.</span></h1><p class="lead">That page doesn\'t exist. Try the <a href="/">home page</a> or the <a href="/scan/">free app scan</a>.</p></section>')
 
-# sitemap / robots / llms
+# sitemap / robots
 LASTMOD = {f"/blog/{bp['slug']}/": bp["date"] for bp in POSTS}
 LASTMOD.update({"/": "2026-10-17", "/pricing/": "2026-10-17", "/launch-kit/": "2026-10-17", "/rescue/": "2026-10-17", "/agents/": "2026-10-17", "/blog/": max(bp["date"] for bp in POSTS)})
 paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/","/blog/"] + [f"/blog/{bp['slug']}/" for bp in POSTS]
 open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{LASTMOD.get(p, '2026-10-16')}</lastmod></url>\n" for p in paths) + "</urlset>\n")
 open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
-open(os.path.join(OUT,"llms.txt"),"w").write(f"""# Obrainsights
-
-> Obrainsights (obrainsights.com) is a productized services business for solo builders. It turns an idea, a prompt, or a half-broken vibe-coded app into a live, working product, then sets up AI agents to help run it. Work is delivered by AI agents and verified by a human. All prices are fixed, in USD, paid upfront, and currently marked as proposed launch pricing.
-
-## Services
-- [Prompt-to-Launch Kit]({SITE}/launch-kit/): one-page landing site on the customer's domain, waitlist, analytics, basic branding, launch copy.
-- [Vibe-Coded App Rescue]({SITE}/rescue/): audit and fix of apps built with Cursor, Lovable, Bolt, Replit, v0, or Claude Code (deploy, auth, security, bugs, performance). Fixes delivered as pull requests.
-- [Agent Setup Concierge]({SITE}/agents/): done-for-you single-job AI agents (Inbox Triage, Content Repurposing, Lead Research) on customer-owned accounts, plus monthly retainers.
-- [Pricing]({SITE}/pricing/): all tiers.
-- [Free App Scan]({SITE}/scan/): free limited scan of a public URL or repo, report by email.
-
-## Prices
-Prompt-to-Launch Kit:
-{lt(LK_T)}
-
-Vibe-Coded App Rescue:
-{lt(RS_T)}
-
-Agent Setup Concierge:
-{lt(AG_T)}
-
-Retainers (month-to-month; customer pays model/API usage directly):
-{lt(RT_T)}
-
-Rules: the $99 Scan fee is credited toward any Fix tier, including the $149 Quick Fix; Launch Kit buyers get $100 off a Rescue within 60 days; agent setups include one free month of Care; founding customer offer: 30% off any package for the first 10 clients in exchange for a short testimonial, using code FOUNDING30 at checkout or mentioning it on the written quote; work beyond a tier gets a fixed-price change order, never hourly billing.
-
-## Policies
-- Customers own all accounts, domains, and code.
-- Least-privilege, revocable access; credentials are never stored in chat or repos.
-- Every change goes through a pull request the customer approves.
-- Full rebuilds and migrations are out of scope for App Rescue.
-
-## Guides
-{chr(10).join(f"- [{bp['title']}]({SITE}/blog/{bp['slug']}/): {bp['desc']}" for bp in POSTS)}
-
-## Optional
-- [About]({SITE}/about/)
-- [Contact]({SITE}/contact/): email info@obrainsights.com
-- [Newsletter]({SITE}/newsletter/)
-- [Blog]({SITE}/blog/)
-- [Terms]({SITE}/terms/)
-- [Privacy]({SITE}/privacy/)
-""")
 # Static files: site/static/ is the source for brand assets + favicon.ico; copied into OUT on every build.
 _here = os.path.dirname(os.path.abspath(__file__)); _pub = os.path.abspath(os.path.join(_here, "..", "public"))
 if os.path.abspath(OUT) != _pub:  # preview/other outputs: bring along the hand-maintained files in public/
