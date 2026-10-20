@@ -70,9 +70,22 @@ def sel(name, label, opts):
     return f'<label>{e(label)}<select name="{name}">' + "".join(f"<option>{e(o)}</option>" for o in opts) + '</select></label>'
 HONEYPOT = '<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">'
 
+# Breadcrumbs for top-level pages (blog posts build their own 3-level crumbs).
+CRUMB_NAMES = {"/launch-kit/":"Prompt-to-Launch Kit","/rescue/":"Vibe-Coded App Rescue","/agents/":"Agent Setup Concierge","/pricing/":"Pricing",
+               "/scan/":"Free App Scan","/newsletter/":"Newsletter","/about/":"About","/contact/":"Contact","/terms/":"Terms of Service",
+               "/privacy/":"Privacy Policy","/blog/":"Blog"}
+# Page-type nodes so assistants and search engines know which page is the About / Contact page.
+PAGE_TYPES = {"/about/":"AboutPage","/contact/":"ContactPage"}
+def crumbs_ld(path):
+    return {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},
+            {"@type":"ListItem","position":2,"name":CRUMB_NAMES[path],"item":SITE+path}]}
 def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=False):
     url = SITE + path
     graph = [ORG] + (ld or [])
+    if path in PAGE_TYPES:
+        graph.append({"@type":PAGE_TYPES[path],"@id":url+"#webpage","url":url,"name":title,"description":desc,"inLanguage":"en",
+                      "isPartOf":{"@id":SITE+"/#website"},"about":{"@id":SITE+"/#org"},"mainEntity":{"@id":SITE+"/#org"}})
+    if path in CRUMB_NAMES: graph.append(crumbs_ld(path))
     nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path or (h=="/blog/" and path.startswith("/blog/")) else ""}>{t}</a>' for h,t in NAV)
     doc = f'''<!doctype html>
 {pre}<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
