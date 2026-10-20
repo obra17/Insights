@@ -265,9 +265,9 @@ UPD = "October 16, 2026"
 def legal_page(path, title, desc, h1, sections):
     body = f'<section class="hero sm"><p class="eyebrow">Legal (draft)</p><h1>{h1}</h1><p class="muted">Last updated: {UPD}. Draft pending review.</p></section><section class="prose">' + "".join(f"<h2>{e(h)}</h2>" + "".join(f"<p>{x}</p>" for x in ps) for h,ps in sections) + '<p>Questions: <a href="mailto:info@obrainsights.com">info@obrainsights.com</a>.</p></section>'
     page(path, title, desc, body, pre=DRAFT+"\n")
-LLC = "Obrainsights, operated by Obra Ventures LLC"
+LLC = "Obra Insights, operated by Obra Ventures LLC"
 legal_page("/terms/","Terms of Service | Obra Insights","Terms for Obra Insights services (Launch Kits, App Rescue, Agent Setup): scope, Stripe payments, refunds, ownership, and liability.","Terms of <span class=\"accent\">Service</span>",[
- ("Who we are",[f'These terms are an agreement between you and {LLC}, a California limited liability company ("Obrainsights", "we"). By using obrainsights.com or buying a service, you agree to them.']),
+ ("Who we are",[f'These terms are an agreement between you and {LLC}, a California limited liability company ("Obra Insights", "we"). By using obrainsights.com or buying a service, you agree to them.']),
  ("Services",["We offer fixed-scope productized services: the Prompt-to-Launch Kit, Vibe-Coded App Rescue, and Agent Setup Concierge, plus optional monthly retainers. Work is performed largely by AI agents and reviewed by a human. Each engagement is defined by a written scope agreed before payment; if the scope and these terms conflict, the written scope controls."]),
  ("Payments",["Prices are in USD and are paid upfront through Stripe. We never see or store your full card details; Stripe processes payments under its own terms and privacy policy. Retainers renew monthly until cancelled; you can cancel any time before the next billing date and keep service through the end of the paid period."]),
  ("Refunds",["If we have not started work, you can request a full refund. Once work has started, if we fail to deliver the agreed scope we will fix it or refund the undelivered portion. The $99 Health Scan is non-refundable once the report is delivered, but it is credited toward any Fix tier, including the $149 Quick Fix. Request refunds at info@obrainsights.com. [Confirm refund policy.]"]),
