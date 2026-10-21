@@ -1,0 +1,27 @@
+{
+ "name": "Obra Insights",
+ "short_name": "Obra Insights",
+ "description": "Human-led AI implementation for the real world.",
+ "start_url": "/",
+ "scope": "/",
+ "display": "browser",
+ "background_color": "#f9f6f0",
+ "theme_color": "#f9f6f0",
+ "icons": [
+  {
+   "src": "/assets/brand/oi-favicon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/assets/brand/oi-icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "/assets/brand/obra-oi.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
+ ]
+}

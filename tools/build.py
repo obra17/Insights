@@ -93,10 +93,10 @@ def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=Fa
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Obra Insights"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
-{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/favicon.ico?v=oi" sizes="48x48"><link rel="icon" href="/assets/brand/obra-oi.svg" type="image/svg+xml"><link rel="icon" href="/assets/brand/oi-favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/brand/oi-apple-touch-icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css?v={CSS_VER}">
+{'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/favicon.ico?v=oi" sizes="48x48"><link rel="icon" href="/assets/brand/obra-oi.svg" type="image/svg+xml"><link rel="icon" href="/assets/brand/oi-favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/brand/oi-apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css?v={CSS_VER}">
 <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":graph})}</script>
 </head><body>
-<header class="top"><div class="wrap nav"><a class="brand" href="/"><img class="mark" src="/assets/brand/obra-mark-160.png" alt="Obra logo" width="40" height="40"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
+<header class="top"><div class="wrap nav"><a class="brand" href="/"><img class="mark" src="/assets/brand/obra-mark-160.png" alt="Obra Insights logo" width="40" height="40"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></a><nav>{nav}<a class="btn sm" href="/scan/">Free App Scan</a></nav></div></header>
 <main class="wrap">{'<p class="offer"><b>Preview with Stripe TEST checkout.</b> Buy buttons use Stripe test mode. Use card 4242 4242 4242 4242; no real charges.</p>' if TEST_PREVIEW else ''}{body}</main>
 <footer class="foot"><div class="wrap cols">
 <div><p class="brand foot-brand"><img class="oi" src="/assets/brand/obra-oi-96.png" srcset="/assets/brand/obra-oi-96.png 2x, /assets/brand/obra-oi-144.png 3x" alt="Obra Insights OI logo" width="48" height="48" loading="lazy" decoding="async"><span class="wm">OBRA INSIGHTS<span class="dot">.</span></span></p><p class="muted">From prompt to live, working product. Agent-delivered, human-verified.</p></div>
@@ -342,6 +342,13 @@ LASTMOD.update({"/": "2026-10-19", "/pricing/": "2026-10-17", "/launch-kit/": "2
 paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/","/blog/"] + [f"/blog/{bp['slug']}/" for bp in POSTS]
 open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{LASTMOD.get(p, '2026-10-16')}</lastmod></url>\n" for p in paths) + "</urlset>\n")
 open(os.path.join(OUT,"robots.txt"),"w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+# Web app manifest: name + OI icons for Android home-screen installs and browsers that read it.
+json.dump({"name": "Obra Insights", "short_name": "Obra Insights", "description": "Human-led AI implementation for the real world.",
+ "start_url": "/", "scope": "/", "display": "browser", "background_color": "#f9f6f0", "theme_color": "#f9f6f0",
+ "icons": [{"src": "/assets/brand/oi-favicon-192.png", "sizes": "192x192", "type": "image/png"},
+           {"src": "/assets/brand/oi-icon-512.png", "sizes": "512x512", "type": "image/png"},
+           {"src": "/assets/brand/obra-oi.svg", "sizes": "any", "type": "image/svg+xml"}]},
+ open(os.path.join(OUT, "site.webmanifest"), "w"), indent=1)
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
 # Static files: site/static/ is the source for brand assets + favicon.ico; copied into OUT on every build.
 _here = os.path.dirname(os.path.abspath(__file__)); _pub = os.path.abspath(os.path.join(_here, "..", "public"))
