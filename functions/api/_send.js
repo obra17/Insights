@@ -4,7 +4,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json" } });
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
 
-export async function handle(request, env, { label, fields, required, confirm }) {
+export async function handle(request, env, { label, fields, required, confirm, store }) {
   let data;
   try { data = Object.fromEntries(await request.formData()); } catch { return json({ ok: false, error: "Bad request" }, 400); }
   if (data._gotcha) return json({ ok: true }); // honeypot: pretend success for bots
@@ -29,6 +29,10 @@ export async function handle(request, env, { label, fields, required, confirm })
   });
   if (!r.ok) { console.log("resend error", r.status, await r.text()); return json({ ok: false, error: "Send failed" }, 502); }
   const { id } = await r.json();
+  if (store) {
+    // Durable copy for automatic processing (scans/auto_scan.py on the box). Never fails the submission.
+    try { await store(clean, env, request, id); } catch (e) { console.log("store exception", String(e)); }
+  }
   if (confirm) {
     // Customer confirmation (approved by Matt 2026-10-17). A failure here never fails the submission.
     try {

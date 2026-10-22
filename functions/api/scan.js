@@ -17,5 +17,16 @@ const confirm = (d) => ({
       `<p style="margin:0;font-family:${SANS};font-size:15px;line-height:24px;color:#141110;"><strong>The Obra Insights team</strong></p>`,
   }),
 });
+// Each request is stored in KV (binding SCAN_REQUESTS, production only) so scans/auto_scan.py can build and
+// email the report automatically. Key: req:<ISO time>:<uuid>. The box script updates `status` once processed.
+const store = async (d, env, request, alert_id) => {
+  if (!env.SCAN_REQUESTS) return;
+  const created_at = new Date().toISOString();
+  const id = crypto.randomUUID();
+  const rec = { id, created_at, status: "pending", alert_id, email: d.email, app_url: d.app_url, repo_url: d.repo_url,
+    built_with: d.built_with, problem: d.problem, country: (request.cf && request.cf.country) || null,
+    user_agent: (request.headers.get("user-agent") || "").slice(0, 300) };
+  await env.SCAN_REQUESTS.put(`req:${created_at}:${id}`, JSON.stringify(rec));
+};
 export const onRequestPost = ({ request, env }) =>
-  handle(request, env, { label: "Free Scan", fields: ["email", "app_url", "repo_url", "built_with", "problem"], required: ["email", "app_url", "problem"], confirm });
+  handle(request, env, { label: "Free Scan", fields: ["email", "app_url", "repo_url", "built_with", "problem"], required: ["email", "app_url", "problem"], confirm, store });
