@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generates the static site into public/. No dependencies. Run: python3 tools/build.py"""
 import hashlib as _hl
-import json, os, html, sys, shutil
+import json, os, html, sys, shutil, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://obrainsights.com"
 OUT = os.environ.get("OBRA_OUT") or os.path.join(os.path.dirname(__file__), "..", "public")
@@ -79,7 +79,7 @@ PAGE_TYPES = {"/about/":"AboutPage","/contact/":"ContactPage"}
 def crumbs_ld(path):
     return {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},
             {"@type":"ListItem","position":2,"name":CRUMB_NAMES[path],"item":SITE+path}]}
-def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=False):
+def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=False, extra_head=""):
     url = SITE + path
     graph = [ORG] + (ld or [])
     if path in PAGE_TYPES:
@@ -91,7 +91,7 @@ def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=Fa
 {pre}<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">{"" if path.endswith(".html") else f'<link rel="canonical" href="{url}">'}
 <meta property="og:type" content="{og_type}"><meta property="og:site_name" content="Obra Insights"><meta property="og:title" content="{e(title)}">
-<meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">
+<meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/assets/og.png">{extra_head}
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}"><meta name="twitter:image" content="{SITE}/assets/og.png">
 {'<meta name="robots" content="noindex,nofollow">' if (TEST_PREVIEW or noindex) else ''}<meta name="theme-color" content="#f9f6f0"><link rel="icon" href="/favicon.ico?v=oi" sizes="48x48"><link rel="icon" href="/assets/brand/obra-oi.svg" type="image/svg+xml"><link rel="icon" href="/assets/brand/oi-favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/brand/oi-apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,500;1,700&display=swap"><link rel="stylesheet" href="/assets/style.css?v={CSS_VER}">
 <script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@graph":graph})}</script>
@@ -295,21 +295,38 @@ POSTS = sorted(_P1 + _P2, key=lambda p: p["date"], reverse=True)  # newest first
 def nice_date(d):
     import datetime; return datetime.date.fromisoformat(d).strftime("%B %-d, %Y")
 BLOG_CTA = '<section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section>'
+# Topical "Related guides" for each post (internal linking between guides; falls back to newest other posts).
+RELATED = {"ai-app-wont-deploy":["fix-broken-vibe-coded-app","api-keys-leaking-ai-apps","launch-ai-app-from-prompt"],
+           "fix-broken-vibe-coded-app":["ai-app-wont-deploy","supabase-rls-auth-mistakes","api-keys-leaking-ai-apps"],
+           "launch-ai-app-from-prompt":["ai-app-wont-deploy","fix-broken-vibe-coded-app","first-ai-agent-small-business"],
+           "supabase-rls-auth-mistakes":["api-keys-leaking-ai-apps","fix-broken-vibe-coded-app","ai-app-wont-deploy"],
+           "api-keys-leaking-ai-apps":["supabase-rls-auth-mistakes","ai-app-wont-deploy","fix-broken-vibe-coded-app"],
+           "first-ai-agent-small-business":["launch-ai-app-from-prompt","fix-broken-vibe-coded-app","api-keys-leaking-ai-apps"]}
+BYSLUG = {bp["slug"]: bp for bp in POSTS}
+def related_html(slug):
+    rel = [BYSLUG[x] for x in RELATED.get(slug, []) if x in BYSLUG and x != slug]
+    rel += [bp for bp in POSTS if bp["slug"] != slug and bp not in rel]
+    return ('<section class="related"><h2>Related guides</h2><div class="grid3">' + "".join(
+        f'<a class="card svc" href="/blog/{bp["slug"]}/"><span class="tag">{bp["read"]}</span><h3>{e(bp["title"])}</h3><p>{e(bp["desc"])}</p></a>' for bp in rel[:3]) + '</div></section>')
 for bp in POSTS:
     path = f"/blog/{bp['slug']}/"
+    words = len(re.sub(r"<[^>]+>", " ", bp["body"]).split())
     art = {"@type":"Article","headline":bp["title"],"description":bp["desc"],"datePublished":bp["date"],"dateModified":bp["date"],
            "author":{"@type":"Organization","name":"Obra Insights team","url":SITE+"/about/"},"publisher":{"@id":SITE+"/#org"},
-           "mainEntityOfPage":{"@type":"WebPage","@id":SITE+path},"image":SITE+"/assets/og.png","inLanguage":"en"}
+           "mainEntityOfPage":{"@type":"WebPage","@id":SITE+path},"image":SITE+"/assets/og.png","inLanguage":"en",
+           "wordCount":words,"isPartOf":{"@id":SITE+"/blog/#blog"}}
+    ahead = (f'<meta property="article:published_time" content="{bp["date"]}"><meta property="article:modified_time" content="{bp["date"]}">'
+             '<meta property="article:author" content="Obra Insights team"><meta property="article:section" content="Guides">')
     crumbs = {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},{"@type":"ListItem","position":2,"name":"Blog","item":SITE+"/blog/"},{"@type":"ListItem","position":3,"name":bp["title"],"item":SITE+path}]}
     page(path, bp.get("seo", bp["title"]) + " | Obra Insights", bp["desc"],
      f'''<article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · {bp["read"]}</p><h1>{bp["h1"]}</h1><p class="muted">By the Obra Insights team · <time datetime="{bp["date"]}">{nice_date(bp["date"])}</time></p></section>
-<section class="prose">{bp["body"]}</section></article>{BLOG_CTA}''', [art, crumbs], og_type="article")
+<section class="prose">{bp["body"]}</section></article>{related_html(bp["slug"])}{BLOG_CTA}''', [art, crumbs], og_type="article", extra_head=ahead)
 page("/blog/","Blog: Fixing and Launching AI-Built Apps | Obra Insights",
  "Practical guides for vibe coders: fixing broken Lovable, Bolt, Cursor, and Replit apps, getting them deployed, and launching them.",
  '<section class="hero sm"><p class="eyebrow">Blog</p><h1>Ship it, <span class="accent">fix it, launch it.</span></h1><p class="lead">Practical guides for getting AI-built apps from prompt to production.</p></section><section class="grid3">'
  + "".join(f'<a class="card svc" href="/blog/{bp["slug"]}/"><span class="tag">{bp["read"]}</span><h3>{e(bp["title"])}</h3><p>{e(bp["desc"])}</p></a>' for bp in POSTS)
  + '</section>' + BLOG_CTA,
- [{"@type":"Blog","name":"Obra Insights Blog","url":SITE+"/blog/","publisher":{"@id":SITE+"/#org"},
+ [{"@type":"Blog","@id":SITE+"/blog/#blog","name":"Obra Insights Blog","url":SITE+"/blog/","publisher":{"@id":SITE+"/#org"},
    "blogPost":[{"@type":"BlogPosting","headline":bp["title"],"url":f"{SITE}/blog/{bp['slug']}/","datePublished":bp["date"]} for bp in POSTS]}])
 
 page("/thanks/","Payment received | Obra Insights","Thanks for your purchase. Here is what happens next.",
