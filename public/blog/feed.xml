@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>Obra Insights Blog</title>
+<link>https://obrainsights.com/blog/</link>
+<description>Practical guides for getting AI-built apps from prompt to production.</description>
+<language>en</language>
+<atom:link href="https://obrainsights.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
+<lastBuildDate>Sat, 17 Oct 2026 16:00:00 +0000</lastBuildDate>
+<item>
+<title>Supabase RLS and Auth Mistakes in AI-Built Apps (and How to Fix Them)</title>
+<link>https://obrainsights.com/blog/supabase-rls-auth-mistakes/</link>
+<guid isPermaLink="true">https://obrainsights.com/blog/supabase-rls-auth-mistakes/</guid>
+<pubDate>Sat, 17 Oct 2026 16:00:00 +0000</pubDate>
+<description>Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each.</description>
+</item>
+<item>
+<title>Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them</title>
+<link>https://obrainsights.com/blog/api-keys-leaking-ai-apps/</link>
+<guid isPermaLink="true">https://obrainsights.com/blog/api-keys-leaking-ai-apps/</guid>
+<pubDate>Sat, 17 Oct 2026 16:00:00 +0000</pubDate>
+<description>How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed.</description>
+</item>
+<item>
+<title>How to Set Up Your First AI Agent for a Small Business (Without the Hype)</title>
+<link>https://obrainsights.com/blog/first-ai-agent-small-business/</link>
+<guid isPermaLink="true">https://obrainsights.com/blog/first-ai-agent-small-business/</guid>
+<pubDate>Sat, 17 Oct 2026 16:00:00 +0000</pubDate>
+<description>A step-by-step guide to a small business's first AI agent: picking the right job, permissions, testing, human approval, and what it costs to run.</description>
+</item>
+<item>
+<title>Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work</title>
+<link>https://obrainsights.com/blog/ai-app-wont-deploy/</link>
+<guid isPermaLink="true">https://obrainsights.com/blog/ai-app-wont-deploy/</guid>
+<pubDate>Fri, 16 Oct 2026 16:00:00 +0000</pubDate>
+<description>Works in preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.</description>
+</item>
+<item>
+<title>How to Fix a Broken Vibe-Coded App (Without Making It Worse)</title>
+<link>https://obrainsights.com/blog/fix-broken-vibe-coded-app/</link>
+<guid isPermaLink="true">https://obrainsights.com/blog/fix-broken-vibe-coded-app/</guid>
+<pubDate>Fri, 16 Oct 2026 16:00:00 +0000</pubDate>
+<description>Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.</description>
+</item>
+<item>
+<title>How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend</title>
+<link>https://obrainsights.com/blog/launch-ai-app-from-prompt/</link>
+<guid isPermaLink="true">https://obrainsights.com/blog/launch-ai-app-from-prompt/</guid>
+<pubDate>Fri, 16 Oct 2026 16:00:00 +0000</pubDate>
+<description>A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.</description>
+</item>
+</channel>
+</rss>

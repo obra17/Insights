@@ -6,7 +6,7 @@ while todo:
     p = todo.pop()
     if p in seen: continue
     seen.add(p)
-    try: r = urllib.request.urlopen(urllib.request.Request(base+p, headers={"User-Agent": "Mozilla/5.0 (obrainsights-checklinks)"})); body = r.read().decode("utf-8","ignore"); ct = r.headers.get("content-type","")
+    try: r = urllib.request.urlopen(urllib.request.Request(base+p, headers={"User-Agent": "Mozilla/5.0 (obrainsights-checklinks)"}), timeout=20); body = r.read().decode("utf-8","ignore"); ct = r.headers.get("content-type","")
     except Exception as e: bad.append((p, str(e))); continue
     if "html" in ct:
         for m in re.findall(r'<script type="application/ld\+json">(.*?)</script>', body, re.S): json.loads(m)

@@ -133,7 +133,7 @@ create policy "Owners insert their projects" on public.projects
 "title": "How to Set Up Your First AI Agent for a Small Business (Without the Hype)",
 "seo": "How to Set Up Your First AI Agent for a Small Business",
 "h1": 'Your first AI agent: <span class="accent">one job, done well.</span>',
-"desc": "A practical, step-by-step guide to setting up a first AI agent for a small business: picking the right job, permissions, testing, human approval, and running costs.",
+"desc": "A step-by-step guide to a small business's first AI agent: picking the right job, permissions, testing, human approval, and what it costs to run.",
 "date": "2026-10-17",
 "read": "8 min read",
 "body": """

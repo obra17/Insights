@@ -6,7 +6,7 @@ POSTS = [
 "title": "Lovable, Bolt, or Cursor App Won't Deploy? 9 Fixes That Actually Work",
 "seo": "AI-Built App Won't Deploy? 9 Fixes That Work",
 "h1": 'Your AI-built app won\'t deploy. <span class="accent">Here\'s what to check.</span>',
-"desc": "Works in the preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.",
+"desc": "Works in preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won't deploy, and how to fix each one.",
 "date": "2026-10-16",
 "read": "7 min read",
 "body": """
