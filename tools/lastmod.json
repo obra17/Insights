@@ -1,0 +1,74 @@
+{
+ "/": {
+  "date": "2026-10-19",
+  "hash": "196aec72b4fa4675afbfe819aa5ba3b33b2aad16409bd35ab5340850a627b942"
+ },
+ "/about/": {
+  "date": "2026-10-19",
+  "hash": "c951ed5c13c9ca5d59fee58dda0a09efc4008d76606536bc9560937d50b66997"
+ },
+ "/agents/": {
+  "date": "2026-10-19",
+  "hash": "3c80253852105a5f233c2c5e1a55ac8e7ee64da25d619c1a7cd97bc9a862585c"
+ },
+ "/blog/": {
+  "date": "2026-10-26",
+  "hash": "c557a1cf5dd2cdf5f662236fea0a53abb5a7b47c073f882489eb8688d6ef7ff8"
+ },
+ "/blog/ai-app-wont-deploy/": {
+  "date": "2026-10-22",
+  "hash": "26be5677d2010e13e8de71f3215c31d3299c8a1fadaf1e7a8f661e85f2439dcf"
+ },
+ "/blog/api-keys-leaking-ai-apps/": {
+  "date": "2026-10-26",
+  "hash": "27b4c44cbac4a27bce36a03e876df6dbcba658d6d1d0bbb37b64df7348b65344"
+ },
+ "/blog/first-ai-agent-small-business/": {
+  "date": "2026-10-22",
+  "hash": "5f8e3d655a72c131e52f4faa82fb431e8d2a64cb7f2abd947b95ca5bce6887f3"
+ },
+ "/blog/fix-broken-vibe-coded-app/": {
+  "date": "2026-10-26",
+  "hash": "e84e73c96cb3ea601e2db74dad290878be0c8894cb76678a26ed758c58d696ed"
+ },
+ "/blog/launch-ai-app-from-prompt/": {
+  "date": "2026-10-26",
+  "hash": "bb902c41a1c743d1c77ba24f9560ee02cc6344e45698a293196d29f56a394174"
+ },
+ "/blog/supabase-rls-auth-mistakes/": {
+  "date": "2026-10-26",
+  "hash": "83fa0970e8a40d430031ee182a197771923ff1c3ecade2366939710e005f72c3"
+ },
+ "/contact/": {
+  "date": "2026-10-19",
+  "hash": "9a4a2d58744a5951340d1c777f3d3f3ada73d0185e2fa7530de7c65cefbd75ca"
+ },
+ "/launch-kit/": {
+  "date": "2026-10-19",
+  "hash": "68033b92f72b6d5197107791db8b1fabdb06cc39a1d19caf2044659dc1abc9bb"
+ },
+ "/newsletter/": {
+  "date": "2026-10-19",
+  "hash": "a546ec91c1e2d6967d4c6a0f3fb43626454c9d30838d165e92efae9d1b1c8b1d"
+ },
+ "/pricing/": {
+  "date": "2026-10-19",
+  "hash": "5df15b05ae128d18c2bd8f0181ec08ce3e6e93bcc23047693146d91b8b560dfa"
+ },
+ "/privacy/": {
+  "date": "2026-10-20",
+  "hash": "daefb4191791e881f725df9da739a0e8a01986a3ee731c66ddf20617b1f0a9aa"
+ },
+ "/rescue/": {
+  "date": "2026-10-19",
+  "hash": "919f39d4dce7eab09d57d90687195ef4cffd40b718573ca39fda5f571aeb5b87"
+ },
+ "/scan/": {
+  "date": "2026-10-22",
+  "hash": "dfd382bf68ce69bdbbbcad3e89385af643bf264909f585c3bd8e6556adba9847"
+ },
+ "/terms/": {
+  "date": "2026-10-20",
+  "hash": "b32290f0bdf2028e211a643b791cdfe2ac11ed5ea4f7d6e24bf3a66d3ef23240"
+ }
+}

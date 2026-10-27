@@ -2,6 +2,7 @@
 """Generates the static site into public/. No dependencies. Run: python3 tools/build.py"""
 import hashlib as _hl
 import json, os, html, sys, shutil, re
+import datetime as _dt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://obrainsights.com"
 OUT = os.environ.get("OBRA_OUT") or os.path.join(os.path.dirname(__file__), "..", "public")
@@ -354,18 +355,38 @@ page("/404.html","Page not found | Obra Insights","This page does not exist. Try
  '<section class="hero sm"><h1>404: <span class="accent">nothing here.</span></h1><p class="lead">That page doesn\'t exist. Try the <a href="/">home page</a> or the <a href="/scan/">free app scan</a>.</p></section>')
 
 # sitemap / robots
-LASTMOD = {f"/blog/{bp['slug']}/": bp["date"] for bp in POSTS}
-LASTMOD.update({"/": "2026-10-19", "/pricing/": "2026-10-17", "/launch-kit/": "2026-10-17", "/rescue/": "2026-10-17", "/agents/": "2026-10-17", "/blog/": max(bp["date"] for bp in POSTS)})
+# Sitemap lastmod / article dateModified: the real date each page's visible text last changed.
+# tools/lastmod.json stores {path: {"date", "hash"}} where hash = sha256 of the visible body text (scripts and tags stripped).
+# A production build (OUT = public/) bumps a page to today's date only when its visible text changed; head/meta-only
+# edits (JSON-LD, og tags) do not count. Seeded 2026-10-27 from the git history of public/.
+_LM_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lastmod.json")
+_LM = json.load(open(_LM_FILE)) if os.path.exists(_LM_FILE) else {}
+_IS_PUB = os.path.abspath(OUT) == os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public"))
+def _vis_hash(path):
+    t = open(os.path.join(OUT, path.lstrip("/"), "index.html")).read().split("<body", 1)[-1]
+    t = re.sub(r"<script.*?</script>", "", t, flags=re.S); t = re.sub(r"<[^>]+>", " ", t)
+    return _hl.sha256(re.sub(r"\s+", " ", html.unescape(t)).strip().encode()).hexdigest()
 paths = ["/","/launch-kit/","/rescue/","/agents/","/pricing/","/scan/","/newsletter/","/about/","/contact/","/terms/","/privacy/","/blog/"] + [f"/blog/{bp['slug']}/" for bp in POSTS]
-open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{LASTMOD.get(p, '2026-10-16')}</lastmod></url>\n" for p in paths) + "</urlset>\n")
+LASTMOD, _lm_changed = {}, False
+for _p in paths:
+    _h = _vis_hash(_p); _rec = _LM.get(_p)
+    if _rec and _rec["hash"] == _h: LASTMOD[_p] = _rec["date"]
+    elif _IS_PUB and not SHOW_BUY:
+        LASTMOD[_p] = _dt.date.today().isoformat(); _LM[_p] = {"date": LASTMOD[_p], "hash": _h}; _lm_changed = True
+    else: LASTMOD[_p] = _rec["date"] if _rec else _dt.date.today().isoformat()
+if _lm_changed: json.dump(_LM, open(_LM_FILE, "w"), indent=1, sort_keys=True)
+for bp in POSTS:  # article:modified_time + Article dateModified follow the page's real last visible change
+    _f = os.path.join(OUT, "blog", bp["slug"], "index.html"); _m = max(LASTMOD[f"/blog/{bp['slug']}/"], bp["date"]); _t = open(_f).read()
+    _t = _t.replace(f'"dateModified": "{bp["date"]}"', f'"dateModified": "{_m}"').replace(f'article:modified_time" content="{bp["date"]}"', f'article:modified_time" content="{_m}"')
+    open(_f, "w").write(_t)
+open(os.path.join(OUT,"sitemap.xml"),"w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{LASTMOD[p]}</lastmod></url>\n" for p in paths) + "</urlset>\n")
 # RSS feed for the blog (feed readers, aggregators and AI/search crawlers discover new guides from it).
 from email.utils import format_datetime as _fd
-import datetime as _dt
 def _rfc(d): return _fd(_dt.datetime.combine(_dt.date.fromisoformat(d), _dt.time(16, 0), tzinfo=_dt.timezone.utc))
 def _x(s): return html.escape(s, quote=False)
 open(os.path.join(OUT, "blog", "feed.xml"), "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n'
  f'<title>Obra Insights Blog</title>\n<link>{SITE}/blog/</link>\n<description>Practical guides for getting AI-built apps from prompt to production.</description>\n<language>en</language>\n'
- f'<atom:link href="{SITE}/blog/feed.xml" rel="self" type="application/rss+xml"/>\n<lastBuildDate>{_rfc(max(bp["date"] for bp in POSTS))}</lastBuildDate>\n'
+ f'<atom:link href="{SITE}/blog/feed.xml" rel="self" type="application/rss+xml"/>\n<lastBuildDate>{_rfc(max(LASTMOD[f"/blog/{bp['slug']}/"] for bp in POSTS))}</lastBuildDate>\n'
  + "".join(f'<item>\n<title>{_x(bp["title"])}</title>\n<link>{SITE}/blog/{bp["slug"]}/</link>\n<guid isPermaLink="true">{SITE}/blog/{bp["slug"]}/</guid>\n<pubDate>{_rfc(bp["date"])}</pubDate>\n<description>{_x(bp["desc"])}</description>\n</item>\n' for bp in POSTS)
  + '</channel>\n</rss>\n')
 AI_BOTS = ["GPTBot","OAI-SearchBot","ChatGPT-User","ClaudeBot","Claude-SearchBot","Claude-User","PerplexityBot","Perplexity-User","Google-Extended","Applebot-Extended","Bingbot"]
