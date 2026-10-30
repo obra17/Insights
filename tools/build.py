@@ -78,14 +78,24 @@ CRUMB_NAMES = {"/launch-kit/":"Prompt-to-Launch Kit","/rescue/":"Vibe-Coded App 
 # Page-type nodes so assistants and search engines know which page is the About / Contact page.
 PAGE_TYPES = {"/about/":"AboutPage","/contact/":"ContactPage"}
 def crumbs_ld(path):
-    return {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},
+    return {"@type":"BreadcrumbList","@id":SITE+path+"#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},
             {"@type":"ListItem","position":2,"name":CRUMB_NAMES[path],"item":SITE+path}]}
 def page(path, title, desc, body, ld=None, pre="", og_type="website", noindex=False, extra_head=""):
     url = SITE + path
     graph = [ORG] + (ld or [])
     if path in PAGE_TYPES:
         graph.append({"@type":PAGE_TYPES[path],"@id":url+"#webpage","url":url,"name":title,"description":desc,"inLanguage":"en",
-                      "isPartOf":{"@id":SITE+"/#website"},"about":{"@id":SITE+"/#org"},"mainEntity":{"@id":SITE+"/#org"}})
+                      "isPartOf":{"@id":SITE+"/#website"},"about":{"@id":SITE+"/#org"},"mainEntity":{"@id":SITE+"/#org"},
+                      "breadcrumb":{"@id":url+"#breadcrumb"}})
+    elif not (noindex or TEST_PREVIEW or path.endswith(".html") or path.startswith("/blog/")):
+        # Plain WebPage node for indexable top-level pages (home, services, pricing, scan, newsletter, legal), tied to the
+        # site, publisher and breadcrumb; service pages also point mainEntity at their Service node.
+        wp = {"@type":"WebPage","@id":url+"#webpage","url":url,"name":title,"description":desc,"inLanguage":"en",
+              "isPartOf":{"@id":SITE+"/#website"},"publisher":{"@id":SITE+"/#org"},"about":{"@id":SITE+"/#org"}}
+        svc = [n for n in graph if n.get("@type") == "Service"]
+        if svc: svc[0]["@id"] = url+"#service"; wp["mainEntity"] = {"@id":url+"#service"}
+        if path in CRUMB_NAMES: wp["breadcrumb"] = {"@id":url+"#breadcrumb"}
+        graph.append(wp)
     if path in CRUMB_NAMES: graph.append(crumbs_ld(path))
     nav = "".join(f'<a href="{h}"{" aria-current=page" if h==path or (h=="/blog/" and path.startswith("/blog/")) else ""}>{t}</a>' for h,t in NAV)
     doc = f'''<!doctype html>
