@@ -322,23 +322,30 @@ def related_html(slug):
 for bp in POSTS:
     path = f"/blog/{bp['slug']}/"
     words = len(re.sub(r"<[^>]+>", " ", bp["body"]).split())
-    art = {"@type":"Article","headline":bp["title"],"description":bp["desc"],"datePublished":bp["date"],"dateModified":bp["date"],
+    art = {"@type":"Article","@id":SITE+path+"#article","url":SITE+path,"headline":bp["title"],"description":bp["desc"],"datePublished":bp["date"],"dateModified":bp["date"],
            "author":{"@type":"Organization","name":"Obra Insights team","url":SITE+"/about/"},"publisher":{"@id":SITE+"/#org"},
-           "mainEntityOfPage":{"@type":"WebPage","@id":SITE+path},"image":SITE+"/assets/og.png","inLanguage":"en",
+           "mainEntityOfPage":{"@id":SITE+path+"#webpage"},"image":SITE+"/assets/og.png","inLanguage":"en",
            "wordCount":words,"isPartOf":{"@id":SITE+"/blog/#blog"}}
+    # WebPage node for the post, tied to the site, breadcrumb and Article so each post is one connected entity graph.
+    wpost = {"@type":"WebPage","@id":SITE+path+"#webpage","url":SITE+path,"name":bp.get("seo", bp["title"]) + " | Obra Insights","description":bp["desc"],
+             "inLanguage":"en","isPartOf":{"@id":SITE+"/#website"},"publisher":{"@id":SITE+"/#org"},"breadcrumb":{"@id":SITE+path+"#breadcrumb"},
+             "mainEntity":{"@id":SITE+path+"#article"}}
     ahead = (f'<meta property="article:published_time" content="{bp["date"]}"><meta property="article:modified_time" content="{bp["date"]}">'
              '<meta property="article:author" content="Obra Insights team"><meta property="article:section" content="Guides">')
-    crumbs = {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},{"@type":"ListItem","position":2,"name":"Blog","item":SITE+"/blog/"},{"@type":"ListItem","position":3,"name":bp["title"],"item":SITE+path}]}
+    crumbs = {"@type":"BreadcrumbList","@id":SITE+path+"#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":SITE+"/"},{"@type":"ListItem","position":2,"name":"Blog","item":SITE+"/blog/"},{"@type":"ListItem","position":3,"name":bp["title"],"item":SITE+path}]}
     page(path, bp.get("seo", bp["title"]) + " | Obra Insights", bp["desc"],
      f'''<article><section class="hero sm"><p class="eyebrow"><a href="/blog/">Blog</a> · {bp["read"]}</p><h1>{bp["h1"]}</h1><p class="muted">By the Obra Insights team · <time datetime="{bp["date"]}">{nice_date(bp["date"])}</time></p></section>
-<section class="prose">{bp["body"]}</section></article>{related_html(bp["slug"])}{BLOG_CTA}''', [art, crumbs], og_type="article", extra_head=ahead)
+<section class="prose">{bp["body"]}</section></article>{related_html(bp["slug"])}{BLOG_CTA}''', [art, wpost, crumbs], og_type="article", extra_head=ahead)
 page("/blog/","Blog: Fixing and Launching AI-Built Apps | Obra Insights",
  "Practical guides for vibe coders: fixing broken Lovable, Bolt, Cursor, and Replit apps, getting them deployed, and launching them.",
  '<section class="hero sm"><p class="eyebrow">Blog</p><h1>Ship it, <span class="accent">fix it, launch it.</span></h1><p class="lead">Practical guides for getting AI-built apps from prompt to production.</p></section><section class="grid3">'
  + "".join(f'<a class="card svc" href="/blog/{bp["slug"]}/"><span class="tag">{bp["read"]}</span><h3>{e(bp["title"])}</h3><p>{e(bp["desc"])}</p></a>' for bp in POSTS)
  + '</section>' + BLOG_CTA,
- [{"@type":"Blog","@id":SITE+"/blog/#blog","name":"Obra Insights Blog","url":SITE+"/blog/","publisher":{"@id":SITE+"/#org"},
-   "blogPost":[{"@type":"BlogPosting","headline":bp["title"],"url":f"{SITE}/blog/{bp['slug']}/","datePublished":bp["date"]} for bp in POSTS]}])
+ [{"@type":"Blog","@id":SITE+"/blog/#blog","name":"Obra Insights Blog","url":SITE+"/blog/","inLanguage":"en","isPartOf":{"@id":SITE+"/#website"},"publisher":{"@id":SITE+"/#org"},
+   "blogPost":[{"@type":"BlogPosting","@id":f"{SITE}/blog/{bp['slug']}/#article","headline":bp["title"],"url":f"{SITE}/blog/{bp['slug']}/","datePublished":bp["date"]} for bp in POSTS]},
+  {"@type":"CollectionPage","@id":SITE+"/blog/#webpage","url":SITE+"/blog/","name":"Blog: Fixing and Launching AI-Built Apps | Obra Insights",
+   "description":"Practical guides for vibe coders: fixing broken Lovable, Bolt, Cursor, and Replit apps, getting them deployed, and launching them.",
+   "inLanguage":"en","isPartOf":{"@id":SITE+"/#website"},"publisher":{"@id":SITE+"/#org"},"mainEntity":{"@id":SITE+"/blog/#blog"},"breadcrumb":{"@id":SITE+"/blog/#breadcrumb"}}])
 
 page("/thanks/","Payment received | Obra Insights","Thanks for your purchase. Here is what happens next.",
  f'''<section class="hero sm"><p class="eyebrow">Payment confirmed</p><h1>Payment received. <span class="accent">You're in.</span></h1>
