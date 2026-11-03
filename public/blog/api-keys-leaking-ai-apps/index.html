@@ -13,14 +13,14 @@
 <p>AI coding tools are very good at making things work. They are less careful about <em>where</em> secrets end up. A common pattern: the app calls OpenAI or Stripe straight from the browser, the key sits in a <code>VITE_</code> variable, and the first person to open DevTools can copy it. The bill arrives a few days later.</p>
 <p>Here's how keys leak from vibe-coded apps, how to check yours in about ten minutes, and what to do if you find one.</p>
 
-<h2>Public keys vs. secret keys</h2>
+<h2 id="public-keys-vs-secret-keys">Public keys vs. secret keys</h2>
 <p>Not every key in your frontend is a problem. Some are meant to be public:</p>
 <ul>
 <li><b>Fine in the browser:</b> the Supabase anon (or publishable) key, the Stripe publishable key (<code>pk_live_</code>/<code>pk_test_</code>), Firebase web config, and analytics IDs. These are only safe if your database rules are right; see our <a href="/blog/supabase-rls-auth-mistakes/">Supabase RLS guide</a>.</li>
 <li><b>Never in the browser:</b> Stripe secret keys (<code>sk_live_</code>, <code>rk_live_</code>), the Supabase <code>service_role</code> key, OpenAI or Anthropic keys (<code>sk-</code>, <code>sk-proj-</code>, <code>sk-ant-</code>), AWS keys (<code>AKIA</code>...), email API keys like Resend (<code>re_</code>) or SendGrid (<code>SG.</code>), and webhook signing secrets (<code>whsec_</code>).</li>
 </ul>
 
-<h2>How keys leak</h2>
+<h2 id="how-keys-leak">How keys leak</h2>
 <h3>1. The public prefix</h3>
 <p>Vite apps (most Lovable and Bolt projects) expose any variable starting with <code>VITE_</code> to the browser. Next.js does the same for <code>NEXT_PUBLIC_</code>. When an assistant hits "undefined" for a secret, the fastest fix is adding that prefix. It works, and it publishes the secret in your JavaScript bundle.</p>
 <h3>2. The committed <code>.env</code> file</h3>
@@ -30,7 +30,7 @@
 <h3>4. Logs, errors, and screenshots</h3>
 <p>Keys also show up in <code>console.log</code> output, error messages returned to the browser, demo videos, livestreams, and screenshots shared on X when asking for help.</p>
 
-<h2>Check your app in ten minutes</h2>
+<h2 id="check-your-app-in-ten-minutes">Check your app in ten minutes</h2>
 <ol>
 <li><b>Search the live site.</b> Open your deployed app, open DevTools, go to Sources (Chrome) or Debugger (Firefox), and search all files (Ctrl/Cmd+Shift+F) for <code>sk_live</code>, <code>sk-</code>, <code>service_role</code>, <code>AKIA</code>, <code>re_</code>, and <code>whsec_</code>.</li>
 <li><b>Search the build.</b> Run <code>npm run build</code>, then search the output folder: <code>grep -rE "sk_live|sk-|service_role|AKIA|whsec_" dist/</code> (or <code>.next/</code>). To catch a <code>service_role</code> key, decode any JWT you find and check its <code>role</code> claim.</li>
@@ -38,7 +38,7 @@
 <li><b>Check every prefixed variable.</b> List every <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable in your <code>.env</code> and host settings. Each one should be something you'd be comfortable printing on your homepage.</li>
 </ol>
 
-<h2>If you find a leaked key</h2>
+<h2 id="if-you-find-a-leaked-key">If you find a leaked key</h2>
 <ol>
 <li><b>Rotate it first.</b> Create a new key in the provider's dashboard and revoke the old one. Removing it from your code doesn't help if it's already been copied, and bots scan GitHub for new keys within minutes.</li>
 <li><b>Check usage.</b> Look at the provider's usage and billing pages for activity you don't recognize, and set spend limits or budget alerts where the provider offers them.</li>
@@ -47,7 +47,7 @@
 <li><b>Restrict what's left.</b> Use restricted Stripe keys with only the permissions you need, and lock Google API keys to your domain.</li>
 </ol>
 
-<h2>Keep it from happening again</h2>
+<h2 id="keep-it-from-happening-again">Keep it from happening again</h2>
 <ul>
 <li>Add <code>.env*</code> to <code>.gitignore</code> on day one and commit a <code>.env.example</code> with blank values instead.</li>
 <li>Tell your assistant up front: "Never put secret keys in client code or in VITE_ or NEXT_PUBLIC_ variables. Use a server function." Put that line in your project rules file.</li>
@@ -55,7 +55,7 @@
 <li>Don't paste live keys into AI chats. Use placeholder values and add the real ones in your host's dashboard.</li>
 </ul>
 
-<h2>Want someone to check?</h2>
+<h2 id="want-someone-to-check">Want someone to check?</h2>
 <p>Our <a href="/scan/">free app scan</a> looks at a public URL or public repo for exposed secrets and obvious config problems, and emails you what to fix first. If something turns up, a <a href="/rescue/">$149 Quick Fix</a> moves one leaky integration behind a server function, or the <a href="/rescue/">$99 Health Scan</a> audits the whole app. If your deploy is also failing, start with <a href="/blog/ai-app-wont-deploy/">our deploy checklist</a>.</p>
 </section></article><section class="related"><h2>Related guides</h2><div class="grid3"><a class="card svc" href="/blog/supabase-rls-auth-mistakes/"><span class="tag">8 min read</span><h3>Supabase RLS and Auth Mistakes in AI-Built Apps (and How to Fix Them)</h3><p>Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each.</p></a><a class="card svc" href="/blog/ai-app-wont-deploy/"><span class="tag">7 min read</span><h3>Lovable, Bolt, or Cursor App Won&#x27;t Deploy? 9 Fixes That Actually Work</h3><p>Works in preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won&#x27;t deploy, and how to fix each one.</p></a><a class="card svc" href="/blog/fix-broken-vibe-coded-app/"><span class="tag">7 min read</span><h3>How to Fix a Broken Vibe-Coded App (Without Making It Worse)</h3><p>Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.</p></a></div></section><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
 <footer class="foot"><div class="wrap cols">

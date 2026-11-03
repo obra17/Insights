@@ -12,11 +12,11 @@
 <section class="prose">
 <p>AI tools have made building the first version of an app almost free. Launching it is a different story. Most vibe-coded projects stall in the gap between "it works on my screen" and "strangers are using it." This guide closes that gap with a plan you can finish in a weekend.</p>
 
-<h2>Friday night: shrink the idea</h2>
+<h2 id="friday-night-shrink-the-idea">Friday night: shrink the idea</h2>
 <p>The fastest way to never launch is to start with ten features. Write one sentence: <em>"[Who] can [do one thing] so they [get one result]."</em> For example: "Wedding photographers can turn a client questionnaire into a shot list in one click."</p>
 <p>Then list what's needed to deliver that sentence and nothing else. Usually that's a landing page, a sign-up, the one core action, and a way to pay or join a waitlist. Settings pages, dark mode, and team accounts can wait for version two.</p>
 
-<h2>Friday night: pick your tool and stack</h2>
+<h2 id="friday-night-pick-your-tool-and-stack">Friday night: pick your tool and stack</h2>
 <p>Choose based on where you are, not what's trending:</p>
 <ul>
 <li><b>No code experience:</b> Lovable, Bolt, or v0 for the UI, with Supabase for login and data.</li>
@@ -25,11 +25,11 @@
 </ul>
 <p>Whatever you pick, connect a GitHub repo from day one. You want to own your code, not rent it from the tool.</p>
 
-<h2>Saturday morning: write the prompt like a spec</h2>
+<h2 id="saturday-morning-write-the-prompt-like-a-spec">Saturday morning: write the prompt like a spec</h2>
 <p>A good first prompt reads like a one-page brief: who the user is, the one core flow step by step, what data you store, and what the user sees when something goes wrong. Ask the tool to build the core flow first, with fake data, before adding login or payments.</p>
 <p>Build in small steps and commit after each one that works. "Add the shot list page" is a good prompt. "Build the whole app" is how you end up with a codebase nobody understands.</p>
 
-<h2>Saturday afternoon: add login and data safely</h2>
+<h2 id="saturday-afternoon-add-login-and-data-safely">Saturday afternoon: add login and data safely</h2>
 <p>Add authentication once the core flow works. If you're on Supabase, do two things right away:</p>
 <ul>
 <li>Turn on Row Level Security for every table and add policies so users can only read and write their own rows.</li>
@@ -37,15 +37,15 @@
 </ul>
 <p>Keep secret keys on the server. Anything in a <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable is public.</p>
 
-<h2>Saturday evening: deploy early</h2>
+<h2 id="saturday-evening-deploy-early">Saturday evening: deploy early</h2>
 <p>Deploy the moment you have a working core flow, even if it's ugly. Deploying on Sunday night is when people discover missing environment variables, broken auth redirects, and 404s on refresh. Our <a href="/blog/ai-app-wont-deploy/">deploy troubleshooting guide</a> covers the usual problems.</p>
 <p>Then connect your domain. Buy it from any registrar, point it at your host following the host's instructions, and make sure HTTPS works on both the bare domain and <code>www</code>. Update your auth provider's redirect URLs to the new domain.</p>
 
-<h2>Sunday morning: payments or a waitlist</h2>
+<h2 id="sunday-morning-payments-or-a-waitlist">Sunday morning: payments or a waitlist</h2>
 <p>If you're charging from day one, the simplest path is a hosted checkout: Stripe Payment Links or Stripe Checkout. You don't handle card details, and you can test everything in Stripe's test mode with test cards before going live. If your app unlocks features after payment, grant access from a verified webhook, not from the thank-you page.</p>
 <p>Not ready to charge? Put up a waitlist with a clear promise ("Early access in November, founding price locked in") and collect emails with a newsletter tool.</p>
 
-<h2>Sunday afternoon: the launch checklist</h2>
+<h2 id="sunday-afternoon-the-launch-checklist">Sunday afternoon: the launch checklist</h2>
 <p>Before you tell anyone, run through this list:</p>
 <ul>
 <li>Sign up, log in, log out, and reset a password on your phone and your laptop.</li>
@@ -56,10 +56,10 @@
 <li>Submit your sitemap to Google Search Console.</li>
 </ul>
 
-<h2>Sunday evening: announce it</h2>
+<h2 id="sunday-evening-announce-it">Sunday evening: announce it</h2>
 <p>Write one short post that explains the problem, shows the product in a screenshot or 30-second clip, and gives one link. Share it where your users already are: X, a relevant subreddit, a Discord, or a Product Hunt launch later in the week. Reply to every comment. Your first ten users will tell you what version two should be.</p>
 
-<h2>What usually goes wrong</h2>
+<h2 id="what-usually-goes-wrong">What usually goes wrong</h2>
 <p>When launches slip, it's rarely the idea. It's the plumbing: DNS, auth redirects, environment variables, webhooks, or an AI assistant stuck in a loop on the last bug. If that's where you are, you're closer than it feels.</p>
 <p>That last stretch is what we do. Our <a href="/launch-kit/">Prompt-to-Launch Kit</a> gets a landing page, waitlist, and launch copy live on your domain in 72 hours, and our <a href="/rescue/">App Rescue</a> fixes AI-built apps that won't make it to production. Not sure which you need? Start with the <a href="/scan/">free scan</a>.</p>
 </section></article><section class="related"><h2>Related guides</h2><div class="grid3"><a class="card svc" href="/blog/ai-app-wont-deploy/"><span class="tag">7 min read</span><h3>Lovable, Bolt, or Cursor App Won&#x27;t Deploy? 9 Fixes That Actually Work</h3><p>Works in preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won&#x27;t deploy, and how to fix each one.</p></a><a class="card svc" href="/blog/fix-broken-vibe-coded-app/"><span class="tag">7 min read</span><h3>How to Fix a Broken Vibe-Coded App (Without Making It Worse)</h3><p>Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.</p></a><a class="card svc" href="/blog/first-ai-agent-small-business/"><span class="tag">8 min read</span><h3>How to Set Up Your First AI Agent for a Small Business (Without the Hype)</h3><p>A step-by-step guide to a small business&#x27;s first AI agent: picking the right job, permissions, testing, human approval, and what it costs to run.</p></a></div></section><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>

@@ -1,0 +1,4 @@
+Contact: mailto:info@obrainsights.com
+Expires: 2027-10-31T07:00:00.000Z
+Preferred-Languages: en
+Canonical: https://obrainsights.com/.well-known/security.txt

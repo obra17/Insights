@@ -13,12 +13,12 @@
 <p>Every vibe coder knows this loop. Something breaks. You ask the AI to fix it. It fixes that and breaks two other things. You ask again. An hour later the app is worse than when you started, and you're not sure which of the last twenty changes caused it.</p>
 <p>The way out isn't a better prompt. It's a better process. Here's the one we use on rescue jobs, adapted so you can do it yourself.</p>
 
-<h2>Step 1: Freeze and save a checkpoint</h2>
+<h2 id="step-1-freeze-and-save-a-checkpoint">Step 1: Freeze and save a checkpoint</h2>
 <p>Stop prompting. Commit everything as it is right now, broken or not, with a message like <code>checkpoint before fix</code>. If your project isn't in Git yet, connect it to GitHub today. Lovable, Bolt, and Replit can all sync to a repo.</p>
 <p>One caution: if your tool syncs both ways with GitHub, decide which side is the source of truth before you edit anywhere else. Editing the repo by hand while the AI tool keeps its own copy is how people lose a week of work.</p>
 <p>Then find the last version that worked. Most tools keep a version history; Git has <code>git log</code>. Knowing the last good point turns "everything is broken" into "something changed between Tuesday and today."</p>
 
-<h2>Step 2: Write down exactly what's broken</h2>
+<h2 id="step-2-write-down-exactly-whats-broken">Step 2: Write down exactly what's broken</h2>
 <p>Vague problems get vague fixes. For each issue, write three lines:</p>
 <ul>
 <li><b>What I did:</b> "Logged in as a new user and clicked Save on the profile page."</li>
@@ -27,16 +27,16 @@
 </ul>
 <p>That last line matters. Open the browser console and the network tab, reproduce the bug, and copy the first error. Ninety percent of the diagnosis is in that one message.</p>
 
-<h2>Step 3: Rank the problems, then fix one at a time</h2>
+<h2 id="step-3-rank-the-problems-then-fix-one-at-a-time">Step 3: Rank the problems, then fix one at a time</h2>
 <p>Sort your list by severity. Our order is: security issues first (anyone can read other users' data, keys exposed), then anything that blocks signup, login, or payment, then broken features, then cosmetic issues.</p>
 <p>Then give the AI exactly one problem per conversation. A good fix prompt looks like this:</p>
 <p><code>Bug: [the three lines from step 2]. Error: [the first console error]. Relevant file: [path]. Before changing code, list the 3 most likely root causes and tell me how to confirm each one. Change only what's needed for the confirmed cause.</code></p>
 <p>Asking for causes before code stops the assistant from rewriting half your app on a guess.</p>
 
-<h2>Step 4: The two-strike rule</h2>
+<h2 id="step-4-the-two-strike-rule">Step 4: The two-strike rule</h2>
 <p>If a fix doesn't work, revert it before trying the next idea. If two fixes in a row fail, stop and add logging instead of more changes: print the values going in and out of the function that's failing. Stacking failed fixes on top of each other is the single biggest reason vibe-coded apps spiral.</p>
 
-<h2>Step 5: Check the usual suspects</h2>
+<h2 id="step-5-check-the-usual-suspects">Step 5: Check the usual suspects</h2>
 <p>Most broken AI-built apps we look at have at least one of these:</p>
 <ul>
 <li><b>Row Level Security off or too open.</b> In Supabase, every table that holds user data needs RLS enabled and policies that limit rows to their owner. A policy of <code>USING (true)</code> means anyone can read everything.</li>
@@ -46,14 +46,14 @@
 <li><b>Webhooks that trust the success URL</b> instead of a verified Stripe event.</li>
 </ul>
 
-<h2>Step 6: The two-user test</h2>
+<h2 id="step-6-the-two-user-test">Step 6: The two-user test</h2>
 <p>This takes sixty seconds and catches the most dangerous bug in vibe-coded apps. Sign up as User A and create something. Open a private window, sign up as User B, and try to view or edit User A's item, either through the UI or by replaying A's network request. If B can see A's data, fix that before anything else.</p>
 
-<h2>Step 7: Verify, then lock it in</h2>
+<h2 id="step-7-verify-then-lock-it-in">Step 7: Verify, then lock it in</h2>
 <p>After each fix, reproduce the original steps and confirm the bug is gone. Then click through signup, login, the main feature, and payment to make sure nothing else broke. Commit with a clear message (<code>fix: profile save 403, add owner RLS policy</code>). Small, labeled commits make the next bug much easier to find.</p>
 <p>If you can, turn the bug into a quick test or a line in a checklist so the next "quick fix" from your assistant doesn't quietly reopen it.</p>
 
-<h2>When it's time to get help</h2>
+<h2 id="when-its-time-to-get-help">When it's time to get help</h2>
 <p>Bring in a second pair of eyes if you've spent more than a day on the same bug, if the problem involves other people's data or money, or if every fix creates a new problem. Sometimes the honest answer is that a section needs rebuilding, and it's better to know that early.</p>
 <p>Our <a href="/rescue/">Health Scan</a> does the steps above for you: a severity-ranked report with evidence, and fixes delivered as pull requests you approve. Start with the <a href="/scan/">free scan</a> to see what turns up.</p>
 </section></article><section class="related"><h2>Related guides</h2><div class="grid3"><a class="card svc" href="/blog/ai-app-wont-deploy/"><span class="tag">7 min read</span><h3>Lovable, Bolt, or Cursor App Won&#x27;t Deploy? 9 Fixes That Actually Work</h3><p>Works in preview, fails in production? The nine most common reasons Lovable, Bolt, Cursor, Replit, and v0 apps won&#x27;t deploy, and how to fix each one.</p></a><a class="card svc" href="/blog/supabase-rls-auth-mistakes/"><span class="tag">8 min read</span><h3>Supabase RLS and Auth Mistakes in AI-Built Apps (and How to Fix Them)</h3><p>Lovable, Bolt, and Cursor apps on Supabase often ship with open tables. Eight common RLS and auth mistakes, the Oct 30 grants change, and how to fix each.</p></a><a class="card svc" href="/blog/api-keys-leaking-ai-apps/"><span class="tag">7 min read</span><h3>Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them</h3><p>How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed.</p></a></div></section><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>

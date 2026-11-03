@@ -12,7 +12,7 @@
 <section class="prose">
 <p>Most small businesses don't need an "autonomous AI workforce." They need one tedious job taken off someone's plate, done reliably, without the agent emailing a customer something strange at 2 a.m. That's a very achievable goal. Here's how to get there.</p>
 
-<h2>1. Pick one job, not a department</h2>
+<h2 id="pick-one-job-not-a-department">1. Pick one job, not a department</h2>
 <p>The best first agent handles work that is:</p>
 <ul>
 <li><b>Repetitive:</b> it happens daily or weekly, in roughly the same shape.</li>
@@ -22,7 +22,7 @@
 </ul>
 <p>Good first jobs include triaging an inbox and drafting replies, researching leads and drafting first-touch messages, turning one video or podcast into posts and a newsletter, and summarizing support tickets into a weekly report. Bad first jobs include anything that moves money, signs contracts, or talks to customers without review.</p>
 
-<h2>2. Write the job down like you'd train a new hire</h2>
+<h2 id="write-the-job-down-like-youd-train-a-new-hire">2. Write the job down like you'd train a new hire</h2>
 <p>Before touching any tool, write a one-page brief:</p>
 <ul>
 <li><b>Trigger:</b> what starts the work (a new email, a new row in a sheet, 8 a.m. every weekday).</li>
@@ -33,7 +33,7 @@
 </ul>
 <p>If you can't write this page, the agent won't be able to follow it either. This document becomes the agent's instructions.</p>
 
-<h2>3. Choose the simplest tool that works</h2>
+<h2 id="choose-the-simplest-tool-that-works">3. Choose the simplest tool that works</h2>
 <p>You don't need to write code for a first agent. Roughly in order of effort:</p>
 <ul>
 <li><b>Built-in assistants</b> in tools you already use (your email, CRM, or helpdesk) for simple summarize-and-draft jobs.</li>
@@ -42,29 +42,29 @@
 </ul>
 <p>Whatever you choose, run it on <b>accounts your business owns</b>, with the model API billed to you. You want to keep the agent if you part ways with whoever built it.</p>
 
-<h2>4. Give it the least access it needs</h2>
+<h2 id="give-it-the-least-access-it-needs">4. Give it the least access it needs</h2>
 <p>This is where most of the risk lives. Give the agent read access and the ability to create <em>drafts</em>, labels, or notes, not to send, delete, or pay. Use a dedicated account or API key for the agent so you can see what it did and revoke access in one click. Add the "send" permission later, one category at a time, once you trust it.</p>
 
-<h2>5. Keep a human approval step</h2>
+<h2 id="keep-a-human-approval-step">5. Keep a human approval step</h2>
 <p>For anything customer-facing, the agent drafts and a person approves. In practice that's a draft sitting in your email, a message in Slack with Approve and Edit buttons, or a row in a sheet waiting for a checkmark. It sounds slow, but reviewing a good draft takes seconds, and the time saved is still most of the job.</p>
 
-<h2>6. Test with real examples before going live</h2>
+<h2 id="test-with-real-examples-before-going-live">6. Test with real examples before going live</h2>
 <p>Collect 20 to 30 real past examples (emails, leads, transcripts) including a few awkward ones. Run the agent on all of them and grade each result: right, fixable, or wrong. Change the instructions and run them again until the "wrong" pile is basically empty. Keep this set. Every time you change a prompt, or the model provider updates its model, rerun it.</p>
 
-<h2>7. Run it in shadow mode for a week</h2>
+<h2 id="run-it-in-shadow-mode-for-a-week">7. Run it in shadow mode for a week</h2>
 <p>Let the agent work on live inputs while you keep doing the job as usual, and compare. You'll find the cases your test set missed. When the agent matches your judgment most of the time and the misses are harmless, switch to approval mode for real.</p>
 
-<h2>8. Watch cost, errors, and drift</h2>
+<h2 id="watch-cost-errors-and-drift">8. Watch cost, errors, and drift</h2>
 <ul>
 <li><b>Cost:</b> set a monthly spend limit on the model API. For a low-volume job, usage is often modest, but a loop or a flood of inputs can surprise you.</li>
 <li><b>Errors:</b> make failures loud. A silent agent that stopped working a week ago is worse than no agent.</li>
 <li><b>Drift:</b> models, APIs, and your business change. Review a sample of the agent's work every week or two, and keep a short runbook so someone else can fix it.</li>
 </ul>
 
-<h2>A realistic first month</h2>
+<h2 id="a-realistic-first-month">A realistic first month</h2>
 <p>Week one: pick the job and write the brief. Week two: build it and test on past examples. Week three: shadow mode. Week four: approval mode, with a weekly review. By the end of the month you should know whether it saves real time, and which job to automate next.</p>
 
-<h2>Want it done for you?</h2>
+<h2 id="want-it-done-for-you">Want it done for you?</h2>
 <p>Our <a href="/agents/">Agent Setup Concierge</a> builds single-job agents (Inbox Triage, Content Repurposing, and Lead Research) on accounts you own, with human approval for anything that sends a message or spends money, a runbook, and monitoring. A <a href="/agents/">Single Agent setup is $1,200</a> and includes a free first month of Care. See <a href="/pricing/">all pricing</a>.</p>
 </section></article><section class="related"><h2>Related guides</h2><div class="grid3"><a class="card svc" href="/blog/launch-ai-app-from-prompt/"><span class="tag">8 min read</span><h3>How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend</h3><p>A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.</p></a><a class="card svc" href="/blog/fix-broken-vibe-coded-app/"><span class="tag">7 min read</span><h3>How to Fix a Broken Vibe-Coded App (Without Making It Worse)</h3><p>Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.</p></a><a class="card svc" href="/blog/api-keys-leaking-ai-apps/"><span class="tag">7 min read</span><h3>Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them</h3><p>How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed.</p></a></div></section><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
 <footer class="foot"><div class="wrap cols">

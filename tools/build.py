@@ -319,7 +319,20 @@ def related_html(slug):
     rel += [bp for bp in POSTS if bp["slug"] != slug and bp not in rel]
     return ('<section class="related"><h2>Related guides</h2><div class="grid3">' + "".join(
         f'<a class="card svc" href="/blog/{bp["slug"]}/"><span class="tag">{bp["read"]}</span><h3>{e(bp["title"])}</h3><p>{e(bp["desc"])}</p></a>' for bp in rel[:3]) + '</div></section>')
+def _anchor_h2s(body):
+    # Stable id on every section heading in a post so search results, AI answers and readers can deep-link a section
+    # (e.g. /blog/ai-app-wont-deploy/#environment-variables-are-missing-in-production). Tag-only change: visible text unchanged.
+    used = set()
+    def _id(m):
+        t = re.sub(r"<[^>]+>", "", m.group(1)); t = re.sub(r"^\d+\.\s*", "", html.unescape(t)).lower().replace("'", "")
+        a = re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+        if len(a) > 60: a = a[:61].rsplit("-", 1)[0]  # cut at a word boundary
+        a = a or "section"; b, i = a, 2
+        while a in used: a = f"{b}-{i}"; i += 1
+        used.add(a); return f'<h2 id="{a}">{m.group(1)}</h2>'
+    return re.sub(r"<h2>(.*?)</h2>", _id, body, flags=re.S)
 for bp in POSTS:
+    bp = dict(bp, body=_anchor_h2s(bp["body"]))
     path = f"/blog/{bp['slug']}/"
     words = len(re.sub(r"<[^>]+>", " ", bp["body"]).split())
     art = {"@type":"Article","@id":SITE+path+"#article","url":SITE+path,"headline":bp["title"],"description":bp["desc"],"datePublished":bp["date"],"dateModified":bp["date"],
@@ -415,6 +428,10 @@ json.dump({"name": "Obra Insights", "short_name": "Obra Insights", "description"
            {"src": "/assets/brand/oi-icon-512.png", "sizes": "512x512", "type": "image/png"},
            {"src": "/assets/brand/obra-oi.svg", "sizes": "any", "type": "image/svg+xml"}]},
  open(os.path.join(OUT, "site.webmanifest"), "w"), indent=1)
+# security.txt (RFC 9116): where to report a security issue. Fixed Expires date so rebuilds are idempotent; renew before it lapses.
+os.makedirs(os.path.join(OUT, ".well-known"), exist_ok=True)
+open(os.path.join(OUT, ".well-known", "security.txt"), "w").write("Contact: mailto:info@obrainsights.com\nExpires: 2027-10-31T07:00:00.000Z\n"
+ f"Preferred-Languages: en\nCanonical: {SITE}/.well-known/security.txt\n")
 def lt(rows): return "\n".join(f"- {a}: {b}. {c}. Turnaround: {d}." for a,b,c,d in rows)
 # Static files: site/static/ is the source for brand assets + favicon.ico; copied into OUT on every build.
 _here = os.path.dirname(os.path.abspath(__file__)); _pub = os.path.abspath(os.path.join(_here, "..", "public"))

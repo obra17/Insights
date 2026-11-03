@@ -13,11 +13,11 @@
 <p>You built something in Lovable, Bolt, Cursor, Replit, or v0. It works in the preview. Then you hit deploy and get a build error, a blank white screen, or a site that loads but can't log anyone in.</p>
 <p>The good news: the code is rarely the problem. Most failed deploys of vibe-coded apps come down to a handful of configuration issues the AI tool hid from you while you were inside its sandbox. Here are the nine we see most often, in the order you should check them.</p>
 
-<h2>1. Read the actual build log first</h2>
+<h2 id="read-the-actual-build-log-first">1. Read the actual build log first</h2>
 <p>Before changing anything, open the build or deploy log on your host (Vercel, Netlify, Cloudflare Pages, Render, or the AI tool's own publish screen) and scroll to the <em>first</em> red line. Not the last one. The last error is usually a side effect. The first one tells you what broke.</p>
 <p>Copy that line, and only that line, into your AI assistant along with the file it points to. Pasting the whole log invites the assistant to "fix" five unrelated things at once.</p>
 
-<h2>2. Environment variables are missing in production</h2>
+<h2 id="environment-variables-are-missing-in-production">2. Environment variables are missing in production</h2>
 <p>This is the number one cause. Your <code>.env</code> file lives on your machine or inside the AI tool. Your host has never seen it. Add every variable in your host's dashboard (Settings, then Environment Variables) and redeploy.</p>
 <p>Two details catch people out:</p>
 <ul>
@@ -26,7 +26,7 @@
 </ul>
 <p>And never put a secret key (Stripe secret, Supabase <code>service_role</code>, OpenAI key) in a <code>VITE_</code> or <code>NEXT_PUBLIC_</code> variable. Anything with those prefixes is readable by anyone who opens your site.</p>
 
-<h2>3. Blank white screen after deploy</h2>
+<h2 id="blank-white-screen-after-deploy">3. Blank white screen after deploy</h2>
 <p>A white screen almost always means JavaScript crashed before it could render. Open the browser console (right-click, Inspect, Console). You'll typically see one of these:</p>
 <ul>
 <li><code>Failed to load module script</code> or 404s on <code>/assets/*.js</code>: your host is serving from the wrong folder. Set the output directory to <code>dist</code> (Vite) or leave the Next.js default.</li>
@@ -34,29 +34,29 @@
 <li>A wrong <code>base</code> path in <code>vite.config</code> if you deploy to a subfolder.</li>
 </ul>
 
-<h2>4. Refreshing any page gives a 404</h2>
+<h2 id="refreshing-any-page-gives-a-404">4. Refreshing any page gives a 404</h2>
 <p>Single-page apps handle routing in the browser. When you refresh <code>/dashboard</code>, the host looks for a real file called <code>dashboard</code>, doesn't find one, and returns 404. Add a rewrite so every unknown path serves <code>index.html</code>:</p>
 <ul>
 <li><b>Netlify / Cloudflare Pages:</b> a <code>_redirects</code> file in your public folder containing <code>/* /index.html 200</code>.</li>
 <li><b>Vercel:</b> a <code>rewrites</code> rule in <code>vercel.json</code> that sends <code>/(.*)</code> to <code>/index.html</code>.</li>
 </ul>
 
-<h2>5. Login works in preview but breaks in production</h2>
+<h2 id="login-works-in-preview-but-breaks-in-production">5. Login works in preview but breaks in production</h2>
 <p>If you use Supabase Auth, go to Authentication, then URL Configuration. Set the Site URL to your live domain and add <code>https://yourdomain.com/**</code> to the Redirect URLs. If you use Google or GitHub sign-in, add the live domain to that provider's OAuth client too. Localhost and the preview URL don't cover production. This is behind most "login loop" and "redirects back to localhost" reports.</p>
 
-<h2>6. The build fails on type or lint errors</h2>
+<h2 id="the-build-fails-on-type-or-lint-errors">6. The build fails on type or lint errors</h2>
 <p>Preview environments are often forgiving. Production builds aren't. <code>next build</code> runs a type check, and a single <code>any</code> mismatch the AI introduced three prompts ago can block the whole deploy. Run <code>npm run build</code> locally to see the same errors. Fix the types rather than switching off checking; the errors usually point at a real bug.</p>
 
-<h2>7. Wrong Node version or a messy lockfile</h2>
+<h2 id="wrong-node-version-or-a-messy-lockfile">7. Wrong Node version or a messy lockfile</h2>
 <p>If the log mentions an unsupported engine, a syntax error inside <code>node_modules</code>, or <code>npm ci</code> failing, pin the Node version your app was built with (an <code>.nvmrc</code> file or the host's Node setting) and make sure exactly one lockfile is committed. Having both <code>package-lock.json</code> and <code>bun.lockb</code> or <code>pnpm-lock.yaml</code> confuses most hosts.</p>
 
-<h2>8. File names that differ only by case</h2>
+<h2 id="file-names-that-differ-only-by-case">8. File names that differ only by case</h2>
 <p>macOS and Windows don't care whether you import <code>./components/Header</code> or <code>./components/header</code>. Linux build servers do. If the log says a module can't be found but you can see the file, check the capitalization.</p>
 
-<h2>9. Payments and webhooks don't fire</h2>
+<h2 id="payments-and-webhooks-dont-fire">9. Payments and webhooks don't fire</h2>
 <p>Stripe checkout opens, the customer pays, and nothing happens in your app. Check that the webhook endpoint is registered for the right mode (test and live are separate), that you're using that endpoint's own signing secret, and that your handler verifies the signature against the raw request body. Grant access from the verified webhook, never from the success-page URL, or anyone can unlock your product by visiting that page.</p>
 
-<h2>When to stop prompting</h2>
+<h2 id="when-to-stop-prompting">When to stop prompting</h2>
 <p>If your assistant has "fixed" the same deploy error three times and it's still failing, stop. Every extra prompt adds changes you'll have to untangle later. Revert to the last commit that built cleanly, then work through the checklist above one item at a time.</p>
 <p>And if you'd rather have someone look at it with fresh eyes, that's exactly what we do. If you already know the one thing that's broken, a <a href="/rescue/">$149 Quick Fix</a> covers a single deploy issue, delivered as a pull request.</p>
 </section></article><section class="related"><h2>Related guides</h2><div class="grid3"><a class="card svc" href="/blog/fix-broken-vibe-coded-app/"><span class="tag">7 min read</span><h3>How to Fix a Broken Vibe-Coded App (Without Making It Worse)</h3><p>Your AI assistant keeps breaking things while fixing them. A practical, step-by-step method for repairing Cursor, Lovable, Bolt, and Replit apps safely.</p></a><a class="card svc" href="/blog/api-keys-leaking-ai-apps/"><span class="tag">7 min read</span><h3>Leaked API Keys and Env Vars in Lovable, Bolt, and Cursor Apps: Find and Fix Them</h3><p>How API keys and env vars leak from AI-built apps, how to check your Lovable, Bolt, or Cursor project in ten minutes, and what to do if a key is exposed.</p></a><a class="card svc" href="/blog/launch-ai-app-from-prompt/"><span class="tag">8 min read</span><h3>How to Launch an AI App From a Prompt: Idea to Live URL in a Weekend</h3><p>A practical weekend plan for turning an idea into a launched AI-built app: scope, build, domain, auth, payments, analytics, and announcing it.</p></a></div></section><section class="band card"><h2>Want a second pair of eyes on your app?</h2><p>Send us a public URL or repo. The free app scan checks for the common deploy, auth, and security problems and emails you what to fix first.</p><a class="btn" href="/scan/">Get a free app scan</a></section></main>
